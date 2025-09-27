@@ -1,59 +1,161 @@
-
 <!DOCTYPE html>
 <html lang="tk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Maks üçin Reňkli Web Sahypa</title>
+<title>Studentiň Raspisanýasy</title>
 <style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        color: white;
-        animation: fonColor 10s infinite alternate;
-    }
-    @keyframes fonColor {
-        0% { background-color: #3498db; }
-        25% { background-color: #e74c3c; }
-        50% { background-color: #f1c40f; }
-        75% { background-color: #2ecc71; }
-        100% { background-color: #9b59b6; }
-    }
-    h1 {
-        margin-top: 50px;
-        font-size: 36px;
-        animation: h1Move 5s infinite alternate;
-    }
-    @keyframes h1Move {
-        0% { transform: translateY(0px); }
-        100% { transform: translateY(20px); }
-    }
-    .menu {
-        margin-top: 30px;
-    }
-    .menu button {
-        padding: 10px 20px;
-        margin: 5px;
-        font-size: 16px;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: transform 0.3s, background-color 0.3s;
-    }
-    .menu button:hover {
-        transform: scale(1.2);
-        background-color: #fff;
-        color: #333;
-    }
+body {
+    margin:0;
+    padding:0;
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color:#fff;
+}
+header {
+    text-align:center;
+    padding:25px;
+    background:rgba(0,0,0,0.5);
+    border-bottom:2px solid #4fc3f7;
+}
+header h1{margin:0;font-size:32px;color:#4fc3f7;}
+header p{margin:5px 0 0;font-size:18px;}
+.week{max-width:1100px;margin:30px auto;padding:20px;background:rgba(255,255,255,0.05);border-radius:20px;}
+.week h2{text-align:center;margin-bottom:20px;font-size:26px;color:#ffcc80;border-bottom:1px solid rgba(255,255,255,0.2);padding-bottom:10px;}
+.day-card{margin-bottom:25px;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.5);}
+.day-header{background:rgba(255,255,255,0.1);padding:10px 15px;font-size:20px;font-weight:bold;color:#fff;}
+table{width:100%;border-collapse:collapse;background:rgba(255,255,255,0.05);}
+th,td{padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.2);}
+th{background:rgba(255,255,255,0.1);}
+tr:hover td{background:rgba(255,255,255,0.1);}
+footer{margin-top:50px;text-align:center;padding:30px;font-size:24px;color:#ffeb3b;}
+.logo{display:inline-block;font-size:60px;font-weight:bold;animation:logoMove 3s infinite alternate;}
+@keyframes logoMove{
+  0%{transform:translateY(0px);}
+  50%{transform:translateY(-15px);}
+  100%{transform:translateY(0px);}
+}
 </style>
 </head>
 <body>
-<h1>Salam, Maks! Web sahypam işe girýär!</h1>
-<div class="menu">
-    <button onclick="alert('Düwmä basdyň!')">Düwme 48</button>
-    <button onclick="alert('Başga düwme basdyň!')">Düwme 2</button>
-    <button onclick="alert('Ýene bir düwme basdyň!')">Düwme 3</button>
+<header>
+<h1>📚 102-nji toparyň raspisanýasy</h1>
+<p id="date"></p>
+</header>
+
+<div class="week" id="week1">
+<h2>1-nji Hepde</h2>
+<div id="days1"></div>
 </div>
+
+<div class="week" id="week2">
+<h2>2-nji Hepde</h2>
+<div id="days2"></div>
+</div>
+
+<footer>
+<span class="logo">TDMI • 2025-2026</span>
+</footer>
+
+<script>
+const today=new Date();
+const options={weekday:'long',year:'numeric',month:'long',day:'numeric'};
+document.getElementById("date").innerText=today.toLocaleDateString("tk-TM",options);
+
+// 1-nji hepde 6 gün, her gün 3 sapak
+const week1={
+"1-nji gün":[
+{time:"08:30-09:50",subject:"Pedagogika (umumy okuw)",teacher:"Mähemow Ahmet"},
+{time:"10:00-11:20",subject:"Iňlis diliniň amaly grammatikasy (amaly okuw)",teacher:"Ýagmyrow Intizar"},
+{time:"11:40-13:00",subject:"Iňlis diliniň amaly fonetikasy (amaly okuw)",teacher:"Berdiýewa Ogulsenem"}
+],
+"2-nji gün":[
+{time:"08:30-09:50",subject:"Iňlis diliniň amaly kursy (amaly okuw)",teacher:"Allaýew Toýly"},
+{time:"10:00-11:20",subject:"Häzirki zaman kompýuter tehnologiýalary (tejribe okuw)",teacher:"Altybaýew Umytjan"},
+{time:"11:40-13:00",subject:"Iňlis diliniň amaly fonetikasy (amaly okuw)",teacher:"Berdiýewa Ogulsenem"}
+],
+"3-nji gün":[
+{time:"08:30-09:50",subject:"Psihologiýa (umumy okuw)",teacher:"Jumageldiýewa Sona"},
+{time:"10:00-11:20",subject:"Iňlis diliniň amaly kursy (amaly okuw)",teacher:"Allaýew Toýly"},
+{time:"11:40-13:00",subject:"Iňlis diliniň amaly grammatikasy (amaly okuw)",teacher:"Ýagmyrow Intizar"}
+],
+"4-nji gün":[
+{time:"08:30-09:50",subject:"Inlis dili",teacher:"Aýgül mugallym"},
+{time:"10:00-11:20",subject:"Matematika",teacher:"Nurmuhamet mugallym"},
+{time:"11:40-13:00",subject:"Taryh",teacher:"Begenç mugallym"}
+],
+"5-nji gün":[
+{time:"08:30-09:50",subject:"Inlis dili",teacher:"Aýgül mugallym"},
+{time:"10:00-11:20",subject:"Matematika",teacher:"Nurmuhamet mugallym"},
+{time:"11:40-13:00",subject:"Taryh",teacher:"Begenç mugallym"}
+],
+"6-nji gün":[
+{time:"08:30-09:50",subject:"Inlis dili",teacher:"Aýgül mugallym"},
+{time:"10:00-11:20",subject:"Matematika",teacher:"Nurmuhamet mugallym"},
+{time:"11:40-13:00",subject:"Taryh",teacher:"Begenç mugallym"}
+]
+};
+
+// 2-nji hepde 6 gün, her gün 3 sapak
+const week2={
+"1-nji gün":[
+{time:"08:30-09:50",subject:"Inlis dili",teacher:"Aýgül mugallym"},
+{time:"10:00-11:20",subject:"Matematika",teacher:"Nurmuhamet mugallym"},
+{time:"11:40-13:00",subject:"Taryh",teacher:"Begenç mugallym"}
+],
+"2-nji gün":[
+{time:"08:30-09:50",subject:"Inlis dili",teacher:"Aýgül mugallym"},
+{time:"10:00-11:20",subject:"Matematika",teacher:"Nurmuhamet mugallym"},
+{time:"11:40-13:00",subject:"Taryh",teacher:"Begenç mugallym"}
+],
+"3-nji gün":[
+{time:"08:30-09:50",subject:"Inlis dili",teacher:"Aýgül mugallym"},
+{time:"10:00-11:20",subject:"Matematika",teacher:"Nurmuhamet mugallym"},
+{time:"11:40-13:00",subject:"Taryh",teacher:"Begenç mugallym"}
+],
+"4-nji gün":[
+{time:"08:30-09:50",subject:"Inlis dili",teacher:"Aýgül mugallym"},
+{time:"10:00-11:20",subject:"Matematika",teacher:"Nurmuhamet mugallym"},
+{time:"11:40-13:00",subject:"Taryh",teacher:"Begenç mugallym"}
+],
+"5-nji gün":[
+{time:"08:30-09:50",subject:"Inlis dili",teacher:"Aýgül mugallym"},
+{time:"10:00-11:20",subject:"Matematika",teacher:"Nurmuhamet mugallym"},
+{time:"11:40-13:00",subject:"Taryh",teacher:"Begenç mugallym"}
+],
+"6-nji gün":[
+{time:"08:30-09:50",subject:"Inlis dili",teacher:"Aýgül mugallym"},
+{time:"10:00-11:20",subject:"Matematika",teacher:"Nurmuhamet mugallym"},
+{time:"11:40-13:00",subject:"Taryh",teacher:"Begenç mugallym"}
+]
+};
+
+function renderWeek(weekData, containerId){
+const container=document.getElementById(containerId);
+for(let day in weekData){
+let card=document.createElement("div");
+card.className="day-card";
+let header=document.createElement("div");
+header.className="day-header";
+header.innerText=day;
+let table=document.createElement("table");
+let thead=document.createElement("thead");
+thead.innerHTML="<tr><th>Wagt</th><th>Sapak</th><th>Mugallym</th></tr>";
+table.appendChild(thead);
+let tbody=document.createElement("tbody");
+weekData[day].forEach(lesson=>{
+let row=document.createElement("tr");
+row.innerHTML=`<td>${lesson.time}</td><td>${lesson.subject}</td><td>${lesson.teacher}</td>`;
+tbody.appendChild(row);
+});
+table.appendChild(tbody);
+card.appendChild(header);
+card.appendChild(table);
+container.appendChild(card);
+}
+}
+
+renderWeek(week1,"days1");
+renderWeek(week2,"days2");
+</script>
 </body>
 </html>
