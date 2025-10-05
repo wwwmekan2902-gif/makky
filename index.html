@@ -49,37 +49,77 @@ footer{margin-top:50px;text-align:center;padding:30px;font-size:24px;color:#ffeb
   display: block;
   filter: brightness(85%);
 }
+.image-section {
+  position: relative;
+  width: 70%;       /* suraty kiçeltmek üçin */
+  max-width: 500px; /* iň köp ölçeg */
+  margin: 80px auto; /* gap ýaly ýerleşdirýär */
+  overflow: hidden;
+  border-radius: 25px;
+  box-shadow: 0 0 40px rgba(0,255,255,0.2);
+  border: 5px solid;
+  border-image: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffcc00) 1;
+  animation: borderColor 5s infinite linear;
+}
+
+.image-section img {
+  width: 100%;
+  border-radius: 20px;
+  display: block;
+  filter: brightness(75%);
+}
+
+/* Akyp duran fon gradienti */
+.image-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(120deg, #00ffff33, #00ffff00, #00ffff33);
+  animation: shine 4s infinite linear;
+}
+
+/* Ýazgy stili */
 .image-text {
   position: absolute;
   top: 50%;
-  left: -100%;
-  transform: translateY(-50%);
-  font-size: 38px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
   font-weight: bold;
-  color: #fff;
-  text-shadow: 0 0 10px #00ffff, 0 0 25px #00ffff;
-  animation: slideIn 4s ease forwards, glow 2s infinite alternate;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #00ffff, #ff00ff, #00ff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 15px #00ffff;
   opacity: 0;
+  animation: fadeIn 3s ease forwards, glow 2s infinite alternate;
 }
-@keyframes slideIn {
-  0% {
-    left: -100%;
-    opacity: 0;
-  }
-  50% {
-    left: 50%;
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
-  100% {
-    left: 50%;
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
+
+/* Animasiýalar */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translate(-50%, -60%); }
+  100% { opacity: 1; transform: translate(-50%, -50%); }
 }
+
 @keyframes glow {
-  from { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
-  to { text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; }
+  from { text-shadow: 0 0 10px #00ffff; }
+  to { text-shadow: 0 0 25px #ff00ff; }
+}
+
+@keyframes shine {
+  0% { left: -50%; }
+  100% { left: 100%; }
+}
+
+@keyframes borderColor {
+  0% { border-image: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffcc00) 1; }
+  25% { border-image: linear-gradient(45deg, #ff00ff, #00ff00, #ffcc00, #00ffff) 1; }
+  50% { border-image: linear-gradient(45deg, #00ff00, #ffcc00, #00ffff, #ff00ff) 1; }
+  75% { border-image: linear-gradient(45deg, #ffcc00, #00ffff, #ff00ff, #00ff00) 1; }
+  100% { border-image: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffcc00) 1; }
 }
 </style>
 </head>
@@ -204,14 +244,10 @@ container.appendChild(card);
 renderWeek(week1,"days1");
 renderWeek(week2,"days2");
 </script>
-<!-- beýleki mazmunlaryň soňy -->
-
+<!-- Animasiýaly surat bölegi -->
 <div class="image-section">
   <img src="https://i.supaimg.com/1f38e4a0-3e88-4b49-8144-2e9c239c6b95.webp" alt="Surat">
   <div class="image-text">BY: BratOK</div>
 </div>
-
-</body>
-</html>
 </body>
 </html>
