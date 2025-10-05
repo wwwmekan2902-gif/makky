@@ -34,6 +34,53 @@ footer{margin-top:50px;text-align:center;padding:30px;font-size:24px;color:#ffeb
   50%{transform:translateY(-15px);}
   100%{transform:translateY(0px);}
 }
+    .image-section {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  margin: 80px auto;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(255,255,255,0.1);
+}
+.image-section img {
+  width: 100%;
+  border-radius: 20px;
+  display: block;
+  filter: brightness(85%);
+}
+.image-text {
+  position: absolute;
+  top: 50%;
+  left: -100%;
+  transform: translateY(-50%);
+  font-size: 38px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 10px #00ffff, 0 0 25px #00ffff;
+  animation: slideIn 4s ease forwards, glow 2s infinite alternate;
+  opacity: 0;
+}
+@keyframes slideIn {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  50% {
+    left: 50%;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    left: 50%;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+@keyframes glow {
+  from { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
+  to { text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff; }
+}
 </style>
 </head>
 <body>
@@ -157,5 +204,14 @@ container.appendChild(card);
 renderWeek(week1,"days1");
 renderWeek(week2,"days2");
 </script>
+<!-- beýleki mazmunlaryň soňy -->
+
+<div class="image-section">
+  <img src="https://i.supaimg.com/1f38e4a0-3e88-4b49-8144-2e9c239c6b95.webp" alt="Surat">
+  <div class="image-text">BY: BratOK</div>
+</div>
+
+</body>
+</html>
 </body>
 </html>
