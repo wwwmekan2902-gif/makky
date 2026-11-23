@@ -2,7 +2,7 @@
 <html lang="tk" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=overlays-content">
 <meta name="theme-color" content="#0b0f1a">
 <title>TMChat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,8 +14,11 @@
 [data-theme=light]{--bg:#e9eefa;--side:#fff;--pane:#fff;--el:#f1f4fc;--bd:#e0e6f3;--t:#121a2e;--m:#667391;--in:#fff;--shadow:0 10px 40px rgba(40,60,120,.18);
 --wp:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='150'%3E%3Cg transform='rotate(-24 120 75)' font-family='Inter,Arial' font-weight='800' font-size='24' fill='%23304070' fill-opacity='.07'%3E%3Ctext x='8' y='52'%3ETMChat%3C/text%3E%3Ctext x='128' y='122'%3ETMChat%3C/text%3E%3C/g%3E%3C/svg%3E")}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%}
-body{background:var(--bg);color:var(--t);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden}
+html,body{width:100%;height:100%;overflow:hidden;overscroll-behavior:none}
+body{position:fixed;inset:0;width:100%;height:100%;background:var(--bg);color:var(--t);font:15px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;touch-action:pan-x pan-y}
+/* Mobile: prevent browser auto-zoom on fields and keep the app viewport stable. */
+input,textarea,select{font-size:16px;touch-action:manipulation}
+button,a{touch-action:manipulation}
 .hide{display:none!important}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 svg.i{width:22px;height:22px;fill:currentColor;flex:none}
@@ -52,7 +55,7 @@ input:focus,textarea:focus{border-color:var(--a);box-shadow:0 0 0 3px #7c5cff26}
 .tabs button.on{background:var(--pane);color:var(--t);box-shadow:0 2px 8px #0003}
 #amsg{color:var(--r);font-size:13px;min-height:18px;text-align:center}
 /* app */
-.app{height:100dvh;display:grid;grid-template-columns:360px 1fr;position:relative}
+.app{position:fixed;inset:0;width:100%;height:100%;height:100svh;display:grid;grid-template-columns:360px 1fr;overflow:hidden;overscroll-behavior:none}
 aside{background:var(--side);border-right:1px solid var(--bd);display:flex;flex-direction:column;min-height:0}
 .sh{display:flex;align-items:center;gap:10px;padding:14px 14px 8px}
 .sh .logo{width:38px;height:38px;border-radius:12px;box-shadow:none}.sh .logo svg{width:22px;height:22px}
@@ -327,6 +330,7 @@ const dayLbl = d => { const x = new Date(d), t = new Date(), y = new Date(Date.n
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let me, peer, users = [], unread = {}, last = {}, shown = new Set(), lastDay = '', signup = false;
 let call = null, incoming = null, ringT = null, ringCtx = null, pairCh = null, typT = null, typK = '', typSent = 0;
+let inboxChannel = null, inboxReady = false, incomingSeen = new Set(), incomingPoll = null;
 
 /* icons + theme */
 document.querySelectorAll('[data-i]').forEach(e => e.innerHTML = ic(e.dataset.i));
@@ -480,14 +484,22 @@ async function start(user) {
   await loadUsers(); setInterval(loadUsers, 60000);
   const beat = () => sb.from('profiles').update({last_seen: new Date().toISOString()}).eq('id', me.id);
   beat(); setInterval(beat, 60000);
-  sb.channel('inbox-' + me.id)
+  inboxChannel = sb.channel('inbox-' + me.id)
     .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'messages', filter: 'receiver_id=eq.' + me.id}, onMsg)
     .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'messages', filter: 'sender_id=eq.' + me.id}, ({new: m}) => {
       const t = document.querySelector(`.m[data-id="${m.id}"] .tk`); if (t && m.is_read) { t.textContent = '✓✓'; t.classList.add('rd'); } })
     .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'calls', filter: 'callee_id=eq.' + me.id}, onCallIns)
     .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'calls', filter: 'callee_id=eq.' + me.id}, onCallUpd)
     .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'calls', filter: 'caller_id=eq.' + me.id}, onCallUpd)
-    .subscribe();
+    .subscribe(status => {
+      inboxReady = status === 'SUBSCRIBED';
+      if (inboxReady) pollIncomingCalls();
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') console.warn('TMChat inbox Realtime:', status);
+    });
+  // Realtime wakytlaýyn kesilse-de, açyk programmada gelýän jaňy gözden kaçyrmaz.
+  clearInterval(incomingPoll);
+  incomingPoll = setInterval(pollIncomingCalls, 4000);
+  setTimeout(pollIncomingCalls, 1200);
 }
 
 /* ---------- LIST ---------- */
@@ -723,22 +735,38 @@ function queueCallSignal(row) {
   });
 }
 
+async function fetchCallSignals(c) {
+  if (!c || call?.id !== c.id) return;
+  const {data, error} = await sb.from('call_signals').select('*').eq('call_id', c.id)
+    .gt('id', c.lastSignalId || 0).order('id', {ascending: true}).limit(100);
+  if (error) throw error;
+  for (const row of (data || [])) {
+    c.lastSignalId = Math.max(c.lastSignalId || 0, Number(row.id) || 0);
+    queueCallSignal(row);
+  }
+}
+
 async function subscribeCallSignals() {
   const c = call;
   c.signalChannel = sb.channel('tmchat-call-signals-' + c.id)
     .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'call_signals', filter: 'call_id=eq.' + c.id}, ({new: row}) => {
-      if (call?.id === c.id) queueCallSignal(row);
+      if (call?.id === c.id) {
+        c.lastSignalId = Math.max(c.lastSignalId || 0, Number(row.id) || 0);
+        queueCallSignal(row);
+      }
     });
-  await new Promise((resolve, reject) => {
+  // Realtime birikmese-de, maglumat bazasyndan signallary yzygiderli okaýar.
+  await new Promise(resolve => {
+    let settled = false;
+    const done = value => { if (!settled) { settled = true; clearTimeout(wait); resolve(value); } };
+    const wait = setTimeout(() => done(false), 5000);
     c.signalChannel.subscribe(status => {
-      if (status === 'SUBSCRIBED') resolve();
-      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') reject(new Error('Jaň signal kanalyna birigip bolmady.'));
+      if (status === 'SUBSCRIBED') done(true);
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') done(false);
     });
   });
-  // Subscription ilki açylýar, soň öň iberilen signal ýazgylary alynýar.
-  const {data, error} = await sb.from('call_signals').select('*').eq('call_id', c.id).order('id', {ascending: true});
-  if (error) throw error;
-  (data || []).forEach(queueCallSignal);
+  await fetchCallSignals(c);
+  c.signalPoll = setInterval(() => fetchCallSignals(c).catch(e => console.warn('Signal polling:', e.message)), 1200);
 }
 
 async function startCall(kind) {
@@ -746,7 +774,7 @@ async function startCall(kind) {
   if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) return alert('Wideo/ses jaň üçin HTTPS sahypa gerek.');
   let stream;
   try { stream = await getMedia(kind); }
-  catch (e) { return alert('Kamera we mikrofon rugsadyny beriň: ' + (e.message || '')); }
+  catch (e) { return alert('Kamera/mikrofon rugsady gerek. Saýty HTTPS arkaly açyň, brauzerde rugsat beriň. ' + (e.message || '')); }
   const target = peer;
   try {
     const {data, error} = await sb.from('calls').insert({caller_id: me.id, callee_id: target.id, kind, status: 'ringing'}).select().single();
@@ -763,7 +791,11 @@ async function startCall(kind) {
   } catch (e) {
     console.error(e);
     stream.getTracks().forEach(t => t.stop());
-    if (call) cleanup();
+    if (call) {
+      const failedId = call.id;
+      await sb.from('calls').update({status: 'missed', ended_at: new Date().toISOString()}).eq('id', failedId).eq('status', 'ringing');
+      cleanup();
+    }
     alert(e.message || 'Jaň başlatmady.');
   }
 }
@@ -778,7 +810,7 @@ function makePC() {
   pc.ontrack = e => {
     if (call?.id !== c.id) return;
     const stream = e.streams?.[0];
-    if (stream) { $('#rv').srcObject = stream; $('#rv').play().catch(() => {}); }
+    if (stream) { $('#rv').srcObject = stream; $('#rv').muted = false; $('#rv').play().catch(() => { $('#cst').textContent = 'Ses üçin ekrana bir gezek basyň'; }); }
   };
   pc.onconnectionstatechange = () => {
     if (call?.id !== c.id) return;
@@ -822,20 +854,6 @@ async function processCallSignal(row) {
   }
 }
 
-function showCall(st) {
-  ring(false); $('#ring').classList.add('hide'); $('#cv').classList.remove('hide');
-  const c = call, v = c.kind === 'video', p = c.peer;
-  $('#cname').textContent = p.full_name || p.username;
-  $('#cst').textContent = st;
-  $('#cavi').textContent = p.avatar_url ? '' : ini(p);
-  $('#cavi').setAttribute('style', avStyle(p));
-  $('#cv').classList.toggle('vo', !v);
-  $('#lv2').classList.toggle('hide', !v);
-  $('#tc').classList.toggle('hide', !v);
-  $('#lv2').srcObject = c.local;
-  $('#lv2').play().catch(() => {});
-}
-
 function connected() {
   if (!call || call.started) return;
   clearTimeout(call.timer); ring(false); call.started = Date.now();
@@ -857,7 +875,7 @@ async function hangup() {
 function cleanup() {
   if (!call) return;
   const c = call; call = null;
-  clearTimeout(c.timer); clearInterval(c.tick); ring(false);
+  clearTimeout(c.timer); clearInterval(c.tick); clearInterval(c.signalPoll); ring(false);
   c.local?.getTracks().forEach(t => t.stop());
   c.pc?.getSenders().forEach(sender => { try { sender.track?.stop(); } catch (e) {} });
   c.pc?.close();
@@ -881,15 +899,29 @@ $('#end').onclick = hangup;
 $('#tm').onclick = () => { const track = call?.local.getAudioTracks()[0]; if (track) { track.enabled = !track.enabled; $('#tm').classList.toggle('off', !track.enabled); } };
 $('#tc').onclick = () => { const track = call?.local.getVideoTracks()[0]; if (track) { track.enabled = !track.enabled; $('#tc').classList.toggle('off', !track.enabled); } };
 
-async function onCallIns({new: r}) {
-  if (r.caller_id === me.id || r.status !== 'ringing') return;
-  if (call || incoming) {
-    await sb.from('calls').update({status: 'declined', ended_at: new Date().toISOString()}).eq('id', r.id);
+async function pollIncomingCalls() {
+  if (!me || document.visibilityState === 'hidden') return;
+  if (incoming) {
+    const {data, error} = await sb.from('calls').select('*').eq('id', incoming.id).maybeSingle();
+    if (!error && data && data.status !== 'ringing') onCallUpd({new: data});
     return;
   }
+  if (call) return;
+  const {data, error} = await sb.from('calls').select('*').eq('callee_id', me.id).eq('status', 'ringing').order('created_at', {ascending: false}).limit(1);
+  if (error) { console.warn('Gelýän jaňy barlamak:', error.message); return; }
+  if (data?.[0]) onCallIns({new: data[0]});
+}
+
+async function onCallIns({new: r}) {
+  if (!r || r.caller_id === me.id || r.status !== 'ringing' || incomingSeen.has(String(r.id))) return;
+  if (call || incoming) {
+    if (incoming?.id !== r.id) await sb.from('calls').update({status: 'declined', ended_at: new Date().toISOString()}).eq('id', r.id).eq('status', 'ringing');
+    return;
+  }
+  incomingSeen.add(String(r.id));
   let p = users.find(u => u.id === r.caller_id);
-  if (!p) { const result = await sb.from('profiles').select('*').eq('id', r.caller_id).single(); p = result.data; }
-  if (!p) return;
+  if (!p) { const result = await sb.from('profiles').select('*').eq('id', r.caller_id).maybeSingle(); p = result.data; }
+  if (!p) { incomingSeen.delete(String(r.id)); return; }
   incoming = {id: r.id, kind: r.kind, peer: p};
   $('#rav').textContent = p.avatar_url ? '' : ini(p);
   $('#rav').setAttribute('style', avStyle(p));
@@ -943,7 +975,9 @@ function ring(on) {
     beep(); ringT = setInterval(beep, 1500);
   } catch (e) {}
 }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') pollIncomingCalls(); });
 addEventListener('beforeunload', () => {
+  clearInterval(incomingPoll);
   if (call) {
     try { call.local?.getTracks().forEach(t => t.stop()); call.pc?.close(); } catch (e) {}
   }
