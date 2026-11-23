@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tk">
 <head>
 <meta charset="utf-8">
@@ -109,9 +109,12 @@ label{display:block;font-weight:600;font-size:13px;margin:14px 0 6px;text-align:
   <h1>TMChat</h1>
   <p class="sub2">Dostlaryňyz bilen çalt we ýönekeý habarlaşyň</p>
   <form id="authForm">
-   <div id="signupOnly" class="hidden"><label for="fullname">Adyňyz</label><input id="fullname" autocomplete="name" placeholder="Meselem: Merdan"></div>
-   <label for="username">Ulanyjy ady</label>
-   <input id="username" autocomplete="username" autocapitalize="none" placeholder="merdan_01">
+   <div id="signupOnly" class="hidden">
+    <label for="fullname">Adyňyz</label><input id="fullname" autocomplete="name" placeholder="Meselem: Merdan">
+    <label for="username">Ulanyjy ady (@)</label><input id="username" autocapitalize="none" autocomplete="off" placeholder="merdan_01">
+   </div>
+   <label for="email">Email</label>
+   <input id="email" type="email" autocomplete="email" autocapitalize="none" placeholder="adyňyz@gmail.com">
    <label for="password">Parol</label>
    <input id="password" type="password" autocomplete="current-password" placeholder="Azyndan 6 simwol">
    <button class="btn" id="authBtn" type="submit">Girmek</button>
@@ -238,20 +241,31 @@ $('switch').onclick = () => setMode(mode === 'login' ? 'signup' : 'login');
 $('authForm').onsubmit = async e => {
   e.preventDefault();
   const err = t => $('authErr').textContent = t;
-  const u = $('username').value.trim().toLowerCase(), pw = $('password').value;
-  if (!/^[a-z0-9_]{3,20}$/.test(u)) return err('Ulanyjy ady: 3–20 simwol, diňe a-z, 0-9 we _ ulanyň');
+  const email = $('email').value.trim().toLowerCase(), pw = $('password').value;
+  if (!/^\S+@\S+\.\S+$/.test(email)) return err('Dogry email salgysyny ýazyň');
   if (pw.length < 6) return err('Parol azyndan 6 simwol bolmaly');
-  const email = u + '@users.tmchat.app';
-  $('authBtn').disabled = true; err('');
-  let r;
+  let r, u = '';
   if (mode === 'signup') {
+    u = $('username').value.trim().toLowerCase();
+    if (!/^[a-z0-9_]{3,20}$/.test(u)) return err('Ulanyjy ady: 3–20 simwol, diňe a-z, 0-9 we _ ulanyň');
+  }
+  $('authBtn').disabled = true; err('');
+  if (mode === 'signup') {
+    const {data: free} = await sb.rpc('username_free', {u});
+    if (free === false) { $('authBtn').disabled = false; return err('Bu ulanyjy ady eýýäm alnan'); }
     r = await sb.auth.signUp({email, password: pw, options: {data: {username: u, full_name: $('fullname').value.trim() || u}}});
     if (!r.error && !r.data.session) r = await sb.auth.signInWithPassword({email, password: pw});
   } else r = await sb.auth.signInWithPassword({email, password: pw});
   $('authBtn').disabled = false;
   if (r.error) {
     const m = r.error.message;
-    err(/Invalid login/i.test(m) ? 'Ulanyjy ady ýa-da parol ýalňyş' : /already registered/i.test(m) ? 'Bu ulanyjy ady eýýäm alnan' : /not confirmed/i.test(m) ? 'Supabase-de "Confirm email" opsiýasyny öçüriň' : m);
+    err(/Invalid login/i.test(m) ? 'Email ýa-da parol ýalňyş'
+      : /already registered/i.test(m) ? 'Bu email bilen hasap eýýäm bar. Giriň'
+      : /Database error/i.test(m) ? 'Bu ulanyjy ady eýýäm alnan'
+      : /rate limit/i.test(m) ? 'Email çäklendirmesi: Supabase-de "Confirm email" opsiýasyny öçüriň'
+      : /not confirmed/i.test(m) ? 'Email tassyklanmady: Supabase-de "Confirm email" opsiýasyny öçüriň'
+      : /invalid/i.test(m) && /email/i.test(m) ? 'Email salgysy nädogry'
+      : m);
   } else boot(r.data.user);
 };
 
