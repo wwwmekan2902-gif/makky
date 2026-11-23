@@ -157,6 +157,17 @@ main{display:flex;flex-direction:column;min-height:0;min-width:0;background:var(
 #lb img{max-width:94vw;max-height:88vh;border-radius:10px}
 #lb a{position:absolute;top:16px;right:16px;color:#fff;width:46px;height:46px;border-radius:50%;background:#ffffff22;display:grid;place-items:center}
 #drop{position:absolute;inset:0;z-index:20;background:#7c5cffcc;display:grid;place-items:center;color:#fff;font-size:22px;font-weight:700;border:3px dashed #fff;margin:10px;border-radius:24px}
+/* profile editor */
+#profileModal{position:fixed;inset:0;z-index:80;background:#050814cc;backdrop-filter:blur(12px);display:grid;place-items:center;padding:18px;overflow:auto}
+#profileModal .pcard{width:min(100%,460px);max-height:calc(100dvh - 36px);overflow:auto;background:var(--pane);border:1px solid var(--bd);border-radius:24px;padding:22px;box-shadow:var(--shadow);display:grid;gap:13px}
+#profileModal .ptop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#profileModal .ptop h2{font-size:20px}
+#profileModal label{display:grid;gap:6px;color:var(--m);font-size:13px;font-weight:600}
+#profileModal textarea{min-height:88px;resize:vertical}
+#profileModal .pavatar{display:grid;justify-items:center;gap:10px;padding:8px 0}
+#profileAvatar{width:94px;height:94px;font-size:30px;border:3px solid var(--a);box-shadow:0 8px 28px #7c5cff44}
+#profileModal .pactions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+#profileMsg{min-height:18px;color:var(--r);font-size:13px}
 @media(max-width:760px){
 .app{grid-template-columns:1fr}
 aside,main{grid-column:1;grid-row:1;transition:transform .28s cubic-bezier(.3,.8,.3,1)}
@@ -194,6 +205,7 @@ main{transform:translateX(100%)}.app.open main{transform:none}.app.open aside{tr
   <aside>
     <div class="sh">
       <div class="logo grad"><svg><use href="#lg"/></svg></div><b>TMChat</b>
+      <button class="ib" id="profileBtn" title="Profili redaktirlemek"></button>
       <button class="ib" id="thm" title="Tema"></button>
       <button class="ib" id="out" title="Çykmak"></button>
     </div>
@@ -248,6 +260,27 @@ main{transform:translateX(100%)}.app.open main{transform:none}.app.open aside{tr
   <div id="ctl" class="row"><button class="rb o" id="tm"></button><button class="rb o" id="tc"></button><button class="rb x" id="end"></button></div>
 </div>
 
+<div id="profileModal" class="hide" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
+  <form id="profileForm" class="pcard">
+    <div class="ptop"><h2 id="profileTitle">Profili redaktirlemek</h2><button type="button" class="ib" id="profileClose" aria-label="Ýapmak">✕</button></div>
+    <div class="pavatar"><div class="av" id="profileAvatar"></div><button type="button" class="btn" id="chooseAvatar">Profil suratyny saýla</button><input id="avatarFile" type="file" accept="image/jpeg,image/png,image/webp" class="hide"></div>
+    <label>Ulanyjy ady<input id="profileUsername" maxlength="20" minlength="3" autocomplete="username" required></label>
+    <label>Doly ady<input id="profileFullName" maxlength="60" placeholder="Doly adyňyz"></label>
+    <label>Özüňiz barada (opisaniýa)<textarea id="profileBio" maxlength="300" placeholder="Özüňiz barada gysgaça..."></textarea></label>
+    <div id="profileMsg"></div>
+    <div class="pactions"><button type="button" class="btn" id="profileCancel" style="background:var(--el);color:var(--t);box-shadow:none">Ýatyr</button><button type="submit" class="btn" id="profileSave">Ýatda sakla</button></div>
+  </form>
+</div>
+
+<div id="contactProfile" class="hide" style="position:fixed;inset:0;z-index:79;background:#050814cc;backdrop-filter:blur(12px);place-items:center;padding:18px" role="dialog" aria-modal="true">
+  <div class="pcard" style="width:min(100%,400px);background:var(--pane);border:1px solid var(--bd);border-radius:24px;padding:24px;display:grid;justify-items:center;gap:12px;text-align:center;box-shadow:var(--shadow)">
+    <button type="button" class="ib" id="contactProfileClose" style="justify-self:end">✕</button>
+    <div class="av" id="contactAvatar" style="width:100px;height:100px;font-size:32px"></div>
+    <h2 id="contactName"></h2><span id="contactUsername" style="color:var(--m)"></span>
+    <p id="contactBio" style="white-space:pre-wrap;overflow-wrap:anywhere"></p>
+  </div>
+</div>
+
 <div id="lb" class="ov hide"><img id="lbi" alt=""><a id="lbd" download title="Ýüklemek" onclick="event.stopPropagation()"></a></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -272,7 +305,7 @@ const P = {
   smile:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-3.500 7a1.200 1.200 0 1 1 0 2.400 1.200 1.200 0 0 1 0-2.400zm7 0a1.200 1.200 0 1 1 0 2.400 1.200 1.200 0 0 1 0-2.400zM12 18c-2.300 0-4.200-1.400-5-3.500h10c-.8 2.100-2.700 3.500-5 3.500z',
   trash:'M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6zM19 4h-3.500l-1-1h-5l-1 1H5v2h14z', back:'M20 11H7.800l5.600-5.600L12 4l-8 8 8 8 1.400-1.400L7.800 13H20z',
   moon:'M21 12.800A9 9 0 1 1 11.200 3a7 7 0 0 0 9.800 9.800z', sun:'M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM11 1h2v3h-2zm0 19h2v3h-2zM1 11h3v2H1zm19 0h3v2h-3z',
-  out:'M10 17l1.400-1.400L8.800 13H20v-2H8.800l2.600-2.600L10 7l-5 5zM4 4h8V2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8v-2H4z',
+  out:'M10 17l1.400-1.400L8.800 13H20v-2H8.800l2.600-2.600L10 7l-5 5zM4 4h8V2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8v-2H4z', user:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5z',
   dl:'M5 20h14v-2H5zM19 9h-4V3H9v6H5l7 7z', mutex:'M3.300 4.700 4.700 3.300 20.700 19.300 19.300 20.700l-3.700-3.700A7 7 0 0 1 12 18v3h-2v-3.100A7 7 0 0 1 5 11h2a5 5 0 0 0 7.500 4.300l-1.500-1.500A3 3 0 0 1 9 11V8.300z'
 };
 const ic = n => `<svg class="i" viewBox="0 0 24 24"><path d="${P[n]}"/></svg>`;
@@ -280,7 +313,12 @@ const fmt = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(
 const sz = b => !b ? '' : b < 1024 ? b + ' B' : b < 1048576 ? (b / 1024).toFixed(0) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
 const ini = u => (u?.full_name || u?.username || '?')[0].toUpperCase();
 const hue = u => { let h = 0; for (const c of (u?.username || 'x')) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
-const avStyle = u => `background-image:linear-gradient(135deg,hsl(${hue(u)} 70% 55%),hsl(${(hue(u) + 50) % 360} 70% 45%))`;
+const avStyle = u => {
+  const base = `linear-gradient(135deg,hsl(${hue(u)} 70% 55%),hsl(${(hue(u) + 50) % 360} 70% 45%))`;
+  let img = '';
+  try { const url = new URL(u?.avatar_url || ''); if (url.protocol === 'https:' || url.protocol === 'http:') img = `,url(${JSON.stringify(url.href)})`; } catch (e) {}
+  return `background-image:${base}${img};background-size:cover;background-position:center${img ? ';color:transparent' : ''}`;
+};
 const online = u => u?.last_seen && Date.now() - new Date(u.last_seen) < 120000;
 const prev = m => ({image: '🖼 Surat', voice: '🎤 Ses habary', file: '📎 ' + m.content})[m.kind] || m.content;
 const tm = d => new Date(d).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
@@ -292,7 +330,7 @@ let call = null, incoming = null, ringT = null, ringCtx = null, pairCh = null, t
 
 /* icons + theme */
 document.querySelectorAll('[data-i]').forEach(e => e.innerHTML = ic(e.dataset.i));
-$('#out').innerHTML = ic('out'); $('#back').innerHTML = ic('back'); $('#cA').innerHTML = ic('phone'); $('#cV').innerHTML = ic('video');
+$('#out').innerHTML = ic('out'); $('#profileBtn').innerHTML = ic('user'); $('#back').innerHTML = ic('back'); $('#cA').innerHTML = ic('phone'); $('#cV').innerHTML = ic('video');
 $('#bEmo').innerHTML = ic('smile'); $('#bPlus').innerHTML = ic('plus'); $('#rcx').innerHTML = ic('trash');
 $('#rno').innerHTML = ic('phone'); $('#ryes').innerHTML = ic('phone'); $('#end').innerHTML = ic('phone');
 $('#tm').innerHTML = ic('mic'); $('#tc').innerHTML = ic('video'); $('#lbd').innerHTML = ic('dl');
@@ -328,6 +366,102 @@ $('#af').onsubmit = async e => {
   }
 };
 $('#out').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+/* ---------- PROFILE EDITOR ---------- */
+let selectedAvatar = null;
+function paintProfilePreview() {
+  const u = {...me};
+  if (selectedAvatar) {
+    if ($('#profileAvatar').dataset.preview) URL.revokeObjectURL($('#profileAvatar').dataset.preview);
+    const tmp = URL.createObjectURL(selectedAvatar);
+    $('#profileAvatar').dataset.preview = tmp;
+    $('#profileAvatar').style.backgroundImage = `url("${tmp}")`;
+    $('#profileAvatar').style.backgroundSize = 'cover';
+    $('#profileAvatar').style.backgroundPosition = 'center';
+    $('#profileAvatar').textContent = '';
+  } else {
+    $('#profileAvatar').setAttribute('style', avStyle(u));
+    $('#profileAvatar').textContent = u.avatar_url ? '' : ini(u);
+  }
+}
+function openProfile() {
+  if (!me) return;
+  selectedAvatar = null;
+  $('#profileUsername').value = me.username || '';
+  $('#profileFullName').value = me.full_name || '';
+  $('#profileBio').value = me.bio || '';
+  $('#avatarFile').value = '';
+  $('#profileMsg').textContent = '';
+  $('#profileModal').classList.remove('hide');
+  paintProfilePreview();
+}
+function closeProfile() {
+  $('#profileModal').classList.add('hide');
+  if ($('#profileAvatar').dataset.preview) URL.revokeObjectURL($('#profileAvatar').dataset.preview);
+  $('#profileAvatar').dataset.preview = '';
+  selectedAvatar = null;
+}
+$('#profileBtn').onclick = openProfile;
+$('#profileClose').onclick = closeProfile;
+$('#profileCancel').onclick = closeProfile;
+$('#profileModal').addEventListener('click', e => { if (e.target === $('#profileModal')) closeProfile(); });
+$('#chooseAvatar').onclick = () => $('#avatarFile').click();
+$('#avatarFile').onchange = e => {
+  const f = e.target.files?.[0]; if (!f) return;
+  if (!/^image\/(jpeg|png|webp)$/.test(f.type)) { $('#profileMsg').textContent = 'JPG, PNG ýa-da WEBP surat saýlaň.'; return; }
+  if (f.size > 5 * 1024 * 1024) { $('#profileMsg').textContent = 'Surat 5 MB-dan uly bolmaly däl.'; return; }
+  selectedAvatar = f; $('#profileMsg').textContent = ''; paintProfilePreview();
+};
+$('#profileForm').onsubmit = async e => {
+  e.preventDefault();
+  const btn = $('#profileSave'), msg = $('#profileMsg');
+  const username = $('#profileUsername').value.trim().toLowerCase();
+  const full_name = $('#profileFullName').value.trim();
+  const bio = $('#profileBio').value.trim();
+  if (!/^[a-z0-9_]{3,20}$/.test(username)) { msg.textContent = 'Ulanyjy ady 3–20 simwol bolmaly (a-z, 0-9, _).'; return; }
+  btn.disabled = true; btn.textContent = 'Ýatda saklanýar…'; msg.textContent = '';
+  try {
+    if (username !== me.username) {
+      const {data, error} = await sb.rpc('username_free', {u: username});
+      if (error) throw error;
+      if (!data) throw new Error('Bu ulanyjy ady eýelenen.');
+    }
+    let avatar_url = me.avatar_url || null;
+    if (selectedAvatar) {
+      const ext = selectedAvatar.type === 'image/png' ? 'png' : selectedAvatar.type === 'image/webp' ? 'webp' : 'jpg';
+      const path = `${me.id}/avatar_${Date.now()}.${ext}`;
+      const {error: uploadError} = await sb.storage.from('avatars').upload(path, selectedAvatar, {upsert: true, contentType: selectedAvatar.type, cacheControl: '3600'});
+      if (uploadError) throw uploadError;
+      avatar_url = sb.storage.from('avatars').getPublicUrl(path).data.publicUrl;
+    }
+    const {data, error} = await sb.from('profiles').update({username, full_name, bio, avatar_url}).eq('id', me.id).select().single();
+    if (error) throw error;
+    me = data;
+    users = users.map(u => u.id === me.id ? me : u);
+    if (peer?.id === me.id) peer = me;
+    renderList();
+    msg.style.color = 'var(--g)'; msg.textContent = 'Profil üstünlikli täzelendi!';
+    setTimeout(closeProfile, 500);
+  } catch (err) {
+    msg.style.color = 'var(--r)'; msg.textContent = err.message || 'Profil täzelenmedi.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Ýatda sakla';
+  }
+};
+function openContactProfile() {
+  if (!peer) return;
+  $('#contactAvatar').textContent = peer.avatar_url ? '' : ini(peer);
+  $('#contactAvatar').setAttribute('style', `width:100px;height:100px;font-size:32px;${avStyle(peer)}`);
+  $('#contactName').textContent = peer.full_name || peer.username;
+  $('#contactUsername').textContent = '@' + peer.username;
+  $('#contactBio').textContent = peer.bio || 'Opisaniýa goşulmadyk.';
+  $('#contactProfile').classList.remove('hide');
+  $('#contactProfile').style.display = 'grid';
+}
+function closeContactProfile() { $('#contactProfile').classList.add('hide'); $('#contactProfile').style.display = 'none'; }
+$('#pav').onclick = openContactProfile; $('#pname').onclick = openContactProfile;
+$('#contactProfileClose').onclick = closeContactProfile;
+$('#contactProfile').addEventListener('click', e => { if (e.target === $('#contactProfile')) closeContactProfile(); });
 
 (async () => {
   const [{data: {session}}] = await Promise.all([sb.auth.getSession(), sleep(1700)]);
@@ -562,113 +696,258 @@ $('#sendb').onclick = mainSend;
 new MutationObserver(() => {}).observe(document.body, {});
 (function fixSend() { const b = $('#sendb'); b.addEventListener('click', () => setTimeout(() => { if (!rec) b.onclick = mainSend; }, 0)); })();
 
-/* ---------- JAŇLAR (WebRTC) ---------- */
-const getMedia = kind => navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}, video: kind === 'video' ? {facingMode: 'user'} : false});
-const send = p => call?.ch?.send({type: 'broadcast', event: 'sig', payload: p});
-$('#cA').onclick = () => startCall('voice'); $('#cV').onclick = () => startCall('video');
+/* ---------- JAŇLAR (WebRTC + PERSISTENT SUPABASE SIGNALING) ---------- */
+const getMedia = kind => navigator.mediaDevices.getUserMedia({
+  audio: {echoCancellation: true, noiseSuppression: true, autoGainControl: true},
+  video: kind === 'video' ? {facingMode: 'user', width: {ideal: 1280}, height: {ideal: 720}} : false
+});
+$('#cA').onclick = () => startCall('voice');
+$('#cV').onclick = () => startCall('video');
+
+async function sendCallSignal(type, payload = {}) {
+  const c = call;
+  if (!c) return;
+  const {error} = await sb.from('call_signals').insert({
+    call_id: c.id, sender_id: me.id, signal_type: type, payload
+  });
+  if (error) throw error;
+}
+
+function queueCallSignal(row) {
+  if (!call || !row || row.sender_id === me.id) return;
+  if (call.seen.has(String(row.id))) return;
+  call.seen.add(String(row.id));
+  call.signalQueue = call.signalQueue.then(() => processCallSignal(row)).catch(err => {
+    console.error('TMChat signaling:', err);
+    if (call) $('#cst').textContent = 'Jaň signalynda säwlik';
+  });
+}
+
+async function subscribeCallSignals() {
+  const c = call;
+  c.signalChannel = sb.channel('tmchat-call-signals-' + c.id)
+    .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'call_signals', filter: 'call_id=eq.' + c.id}, ({new: row}) => {
+      if (call?.id === c.id) queueCallSignal(row);
+    });
+  await new Promise((resolve, reject) => {
+    c.signalChannel.subscribe(status => {
+      if (status === 'SUBSCRIBED') resolve();
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') reject(new Error('Jaň signal kanalyna birigip bolmady.'));
+    });
+  });
+  // Subscription ilki açylýar, soň öň iberilen signal ýazgylary alynýar.
+  const {data, error} = await sb.from('call_signals').select('*').eq('call_id', c.id).order('id', {ascending: true});
+  if (error) throw error;
+  (data || []).forEach(queueCallSignal);
+}
+
 async function startCall(kind) {
   if (call || incoming || !peer) return;
-  if (!navigator.mediaDevices) return alert('Jaň üçin HTTPS gerek');
-  let stream; try { stream = await getMedia(kind); } catch (e) { return alert('Mikrofon/kamera ruhsady gerek'); }
-  const {data, error} = await sb.from('calls').insert({caller_id: me.id, callee_id: peer.id, kind}).select().single();
-  if (error) { stream.getTracks().forEach(t => t.stop()); return alert(error.message); }
-  call = {id: data.id, kind, peer, isCaller: true, local: stream, q: []};
-  showCall('Jaň edilýär…'); join(); call.timer = setTimeout(hangup, 30000); ring(true);
+  if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) return alert('Wideo/ses jaň üçin HTTPS sahypa gerek.');
+  let stream;
+  try { stream = await getMedia(kind); }
+  catch (e) { return alert('Kamera we mikrofon rugsadyny beriň: ' + (e.message || '')); }
+  const target = peer;
+  try {
+    const {data, error} = await sb.from('calls').insert({caller_id: me.id, callee_id: target.id, kind, status: 'ringing'}).select().single();
+    if (error) throw error;
+    call = {id: data.id, kind, peer: target, isCaller: true, local: stream, q: [], seen: new Set(), signalQueue: Promise.resolve()};
+    showCall('Jaň çagyrylýar…');
+    makePC();
+    await subscribeCallSignals();
+    const offer = await call.pc.createOffer();
+    await call.pc.setLocalDescription(offer);
+    await sendCallSignal('offer', call.pc.localDescription.toJSON());
+    call.timer = setTimeout(() => { if (call && !call.started) hangup(); }, 40000);
+    ring(true);
+  } catch (e) {
+    console.error(e);
+    stream.getTracks().forEach(t => t.stop());
+    if (call) cleanup();
+    alert(e.message || 'Jaň başlatmady.');
+  }
 }
-function join() {
-  const ch = sb.channel('call:' + call.id);
-  ch.on('broadcast', {event: 'sig'}, ({payload}) => onSig(payload)).subscribe(s => { if (s === 'SUBSCRIBED' && !call?.isCaller) send({t: 'ready'}); });
-  call.ch = ch;
-}
+
 function makePC() {
-  const pc = new RTCPeerConnection(ICE); call.pc = pc;
-  call.local.getTracks().forEach(t => pc.addTrack(t, call.local));
-  pc.onicecandidate = e => e.candidate && send({t: 'ice', c: e.candidate});
-  pc.ontrack = e => { $('#rv').srcObject = e.streams[0]; $('#rv').play().catch(() => {}); };
-  pc.onconnectionstatechange = () => { if (pc.connectionState === 'connected') connected(); if (pc.connectionState === 'failed') hangup(); };
+  const c = call;
+  const pc = new RTCPeerConnection(ICE); c.pc = pc;
+  c.local.getTracks().forEach(track => pc.addTrack(track, c.local));
+  pc.onicecandidate = e => {
+    if (e.candidate && call?.id === c.id) sendCallSignal('ice-candidate', e.candidate.toJSON()).catch(console.error);
+  };
+  pc.ontrack = e => {
+    if (call?.id !== c.id) return;
+    const stream = e.streams?.[0];
+    if (stream) { $('#rv').srcObject = stream; $('#rv').play().catch(() => {}); }
+  };
+  pc.onconnectionstatechange = () => {
+    if (call?.id !== c.id) return;
+    if (pc.connectionState === 'connected') connected();
+    if (pc.connectionState === 'failed') { $('#cst').textContent = 'Tor birikmesi şowsuz. TURN serwerini barlaň.'; hangup(); }
+    if (pc.connectionState === 'disconnected') $('#cst').textContent = 'Tor birikmesi kesildi…';
+  };
   return pc;
 }
-const flush = async () => { while (call.q.length) await call.pc.addIceCandidate(call.q.shift()); };
-async function onSig(m) {
-  if (!call) return;
-  try {
-    if (m.t === 'ready' && call.isCaller && !call.pc) { const pc = makePC(), o = await pc.createOffer(); await pc.setLocalDescription(o); send({t: 'offer', d: o}); }
-    else if (m.t === 'offer' && !call.isCaller) { const pc = makePC(); await pc.setRemoteDescription(m.d); await flush(); const a = await pc.createAnswer(); await pc.setLocalDescription(a); send({t: 'answer', d: a}); }
-    else if (m.t === 'answer' && call.isCaller) { await call.pc.setRemoteDescription(m.d); await flush(); }
-    else if (m.t === 'ice') { if (call.pc?.remoteDescription) await call.pc.addIceCandidate(m.c); else call.q.push(m.c); }
-    else if (m.t === 'end') cleanup();
-  } catch (e) { console.error(e); }
+
+async function flushCallIce() {
+  const c = call;
+  if (!c?.pc?.remoteDescription) return;
+  while (c.q.length && call?.id === c.id) {
+    const candidate = c.q.shift();
+    await c.pc.addIceCandidate(new RTCIceCandidate(candidate));
+  }
 }
+
+async function processCallSignal(row) {
+  const c = call;
+  if (!c || row.call_id !== c.id || row.sender_id === me.id) return;
+  const payload = row.payload || {};
+  if (row.signal_type === 'offer' && !c.isCaller) {
+    if (c.pc.signalingState !== 'stable') return;
+    await c.pc.setRemoteDescription(new RTCSessionDescription(payload));
+    await flushCallIce();
+    const answer = await c.pc.createAnswer();
+    await c.pc.setLocalDescription(answer);
+    await sendCallSignal('answer', c.pc.localDescription.toJSON());
+    $('#cst').textContent = 'Jogap iberildi…';
+  } else if (row.signal_type === 'answer' && c.isCaller) {
+    if (c.pc.signalingState !== 'have-local-offer') return;
+    await c.pc.setRemoteDescription(new RTCSessionDescription(payload));
+    await flushCallIce();
+  } else if (row.signal_type === 'ice-candidate') {
+    if (c.pc.remoteDescription) await c.pc.addIceCandidate(new RTCIceCandidate(payload));
+    else c.q.push(payload);
+  } else if (row.signal_type === 'hangup') {
+    cleanup();
+  }
+}
+
 function showCall(st) {
   ring(false); $('#ring').classList.add('hide'); $('#cv').classList.remove('hide');
-  const v = call.kind === 'video', p = call.peer;
-  $('#cname').textContent = p.full_name || p.username; $('#cst').textContent = st;
-  $('#cavi').textContent = ini(p); $('#cavi').setAttribute('style', avStyle(p));
-  $('#cv').classList.toggle('vo', !v); $('#lv2').classList.toggle('hide', !v); $('#tc').classList.toggle('hide', !v);
-  $('#lv2').srcObject = call.local;
+  const c = call, v = c.kind === 'video', p = c.peer;
+  $('#cname').textContent = p.full_name || p.username;
+  $('#cst').textContent = st;
+  $('#cavi').textContent = p.avatar_url ? '' : ini(p);
+  $('#cavi').setAttribute('style', avStyle(p));
+  $('#cv').classList.toggle('vo', !v);
+  $('#lv2').classList.toggle('hide', !v);
+  $('#tc').classList.toggle('hide', !v);
+  $('#lv2').srcObject = c.local;
+  $('#lv2').play().catch(() => {});
 }
+
 function connected() {
-  if (call.started) return;
+  if (!call || call.started) return;
   clearTimeout(call.timer); ring(false); call.started = Date.now();
+  $('#cst').textContent = '00:00';
   if (call.kind === 'video') $('#cv').classList.add('vi2');
-  call.tick = setInterval(() => $('#cst').textContent = fmt((Date.now() - call.started) / 1000), 500);
+  call.tick = setInterval(() => { if (call) $('#cst').textContent = fmt((Date.now() - call.started) / 1000); }, 500);
+  sb.from('calls').update({status: 'accepted', answered_at: new Date().toISOString()}).eq('id', call.id).eq('status', 'ringing');
 }
+
 async function hangup() {
-  if (!call) return;
-  const c = call, status = c.started ? 'ended' : (c.isCaller ? 'missed' : 'declined');
-  try { await c.ch?.send({type: 'broadcast', event: 'sig', payload: {t: 'end'}}); } catch (e) {}
+  if (!call || call.closing) return;
+  const c = call; c.closing = true;
+  const status = c.started ? 'ended' : (c.isCaller ? 'missed' : 'declined');
+  try { await sendCallSignal('hangup', {reason: status}); } catch (e) { console.warn(e); }
   await sb.from('calls').update({status, ended_at: new Date().toISOString()}).eq('id', c.id).in('status', ['ringing', 'accepted']);
-  cleanup();
+  if (call?.id === c.id) cleanup();
 }
+
 function cleanup() {
   if (!call) return;
   const c = call; call = null;
   clearTimeout(c.timer); clearInterval(c.tick); ring(false);
-  c.local?.getTracks().forEach(t => t.stop()); c.pc?.close(); if (c.ch) sb.removeChannel(c.ch);
-  $('#rv').srcObject = null; $('#lv2').srcObject = null; $('#cv').classList.add('hide'); $('#cv').classList.remove('vi2');
+  c.local?.getTracks().forEach(t => t.stop());
+  c.pc?.getSenders().forEach(sender => { try { sender.track?.stop(); } catch (e) {} });
+  c.pc?.close();
+  if (c.signalChannel) sb.removeChannel(c.signalChannel);
+  $('#rv').srcObject = null; $('#lv2').srcObject = null;
+  $('#cv').classList.add('hide'); $('#cv').classList.remove('vi2');
   $('#tm').classList.remove('off'); $('#tc').classList.remove('off');
   if (c.isCaller) {
-    const t = `${c.kind === 'video' ? '🎥 Wideo' : '📞 Ses'} jaň · ${c.started ? fmt((Date.now() - c.started) / 1000) : 'jogap ýok'}`;
-    sb.from('messages').insert({sender_id: me.id, receiver_id: c.peer.id, content: t}).select().single().then(({data}) => {
-      if (!data) return; last[c.peer.id] = data; if (peer?.id === c.peer.id) addMsg(data); renderList(); });
+    const duration = c.started ? fmt((Date.now() - c.started) / 1000) : 'jogap ýok';
+    const content = `${c.kind === 'video' ? '🎥 Wideo' : '📞 Ses'} jaň · ${duration}`;
+    sb.from('messages').insert({sender_id: me.id, receiver_id: c.peer.id, content, kind: 'text'}).select().single().then(({data}) => {
+      if (!data) return;
+      last[c.peer.id] = data;
+      if (peer?.id === c.peer.id) addMsg(data);
+      renderList();
+    });
   }
 }
+
 $('#end').onclick = hangup;
-$('#tm').onclick = () => { const t = call?.local.getAudioTracks()[0]; if (t) { t.enabled = !t.enabled; $('#tm').classList.toggle('off', !t.enabled); } };
-$('#tc').onclick = () => { const t = call?.local.getVideoTracks()[0]; if (t) { t.enabled = !t.enabled; $('#tc').classList.toggle('off', !t.enabled); } };
+$('#tm').onclick = () => { const track = call?.local.getAudioTracks()[0]; if (track) { track.enabled = !track.enabled; $('#tm').classList.toggle('off', !track.enabled); } };
+$('#tc').onclick = () => { const track = call?.local.getVideoTracks()[0]; if (track) { track.enabled = !track.enabled; $('#tc').classList.toggle('off', !track.enabled); } };
+
 async function onCallIns({new: r}) {
-  if (call || incoming) return void sb.from('calls').update({status: 'declined', ended_at: new Date().toISOString()}).eq('id', r.id);
+  if (r.caller_id === me.id || r.status !== 'ringing') return;
+  if (call || incoming) {
+    await sb.from('calls').update({status: 'declined', ended_at: new Date().toISOString()}).eq('id', r.id);
+    return;
+  }
   let p = users.find(u => u.id === r.caller_id);
-  if (!p) ({data: p} = await sb.from('profiles').select('*').eq('id', r.caller_id).single());
+  if (!p) { const result = await sb.from('profiles').select('*').eq('id', r.caller_id).single(); p = result.data; }
+  if (!p) return;
   incoming = {id: r.id, kind: r.kind, peer: p};
-  $('#rav').textContent = ini(p); $('#rav').setAttribute('style', avStyle(p)); $('#rname').textContent = p.full_name || p.username;
-  $('#rkind').textContent = r.kind === 'video' ? 'Wideo jaň gelýär…' : 'Ses jaňy gelýär…';
+  $('#rav').textContent = p.avatar_url ? '' : ini(p);
+  $('#rav').setAttribute('style', avStyle(p));
+  $('#rname').textContent = p.full_name || p.username;
+  $('#rkind').textContent = r.kind === 'video' ? 'Wideo jaň gelýär…' : 'Sesli jaň gelýär…';
   $('#ring').classList.remove('hide'); ring(true); navigator.vibrate?.([300, 200, 300]);
 }
+
 function onCallUpd({new: r}) {
-  if (incoming?.id === r.id && r.status !== 'ringing') { incoming = null; ring(false); $('#ring').classList.add('hide'); }
+  if (incoming?.id === r.id && r.status !== 'ringing') {
+    incoming = null; ring(false); $('#ring').classList.add('hide');
+  }
   if (call?.id === r.id && ['ended', 'missed', 'declined'].includes(r.status)) cleanup();
 }
-$('#rno').onclick = async () => { const i = incoming; incoming = null; ring(false); $('#ring').classList.add('hide');
-  await sb.from('calls').update({status: 'declined', ended_at: new Date().toISOString()}).eq('id', i.id); };
-$('#ryes').onclick = async () => {
-  const i = incoming; incoming = null; let stream;
-  try { stream = await getMedia(i.kind); } catch (e) { ring(false); $('#ring').classList.add('hide'); alert('Mikrofon/kamera ruhsady gerek');
-    return void sb.from('calls').update({status: 'declined', ended_at: new Date().toISOString()}).eq('id', i.id); }
-  call = {id: i.id, kind: i.kind, peer: i.peer, isCaller: false, local: stream, q: []};
-  showCall('Birikdirilýär…');
-  await sb.from('calls').update({status: 'accepted', answered_at: new Date().toISOString()}).eq('id', i.id);
-  join(); call.timer = setTimeout(() => { if (call && !call.started) hangup(); }, 20000);
+
+$('#rno').onclick = async () => {
+  const i = incoming; if (!i) return;
+  incoming = null; ring(false); $('#ring').classList.add('hide');
+  await sb.from('calls').update({status: 'declined', ended_at: new Date().toISOString()}).eq('id', i.id).eq('status', 'ringing');
 };
+
+$('#ryes').onclick = async () => {
+  const i = incoming; if (!i || call) return;
+  incoming = null;
+  let stream;
+  try { stream = await getMedia(i.kind); }
+  catch (e) {
+    ring(false); $('#ring').classList.add('hide');
+    await sb.from('calls').update({status: 'declined', ended_at: new Date().toISOString()}).eq('id', i.id);
+    return alert('Mikrofon/kamera rugsady gerek: ' + (e.message || ''));
+  }
+  call = {id: i.id, kind: i.kind, peer: i.peer, isCaller: false, local: stream, q: [], seen: new Set(), signalQueue: Promise.resolve()};
+  try {
+    showCall('Birikdirilýär…');
+    makePC();
+    await subscribeCallSignals();
+    const {error} = await sb.from('calls').update({status: 'accepted', answered_at: new Date().toISOString()}).eq('id', i.id).eq('status', 'ringing');
+    if (error) throw error;
+    call.timer = setTimeout(() => { if (call && !call.started) hangup(); }, 30000);
+  } catch (e) {
+    console.error(e); await hangup(); alert(e.message || 'Jaňa birigip bolmady.');
+  }
+};
+
 function ring(on) {
   clearInterval(ringT); ringT = null; if (!on) return;
   try {
     ringCtx = ringCtx || new (window.AudioContext || window.webkitAudioContext)();
-    const beep = () => { const o = ringCtx.createOscillator(), g = ringCtx.createGain(); o.frequency.value = 480; g.gain.value = .07; o.connect(g); g.connect(ringCtx.destination); o.start(); o.stop(ringCtx.currentTime + .35); };
+    if (ringCtx.state === 'suspended') ringCtx.resume();
+    const beep = () => { const o = ringCtx.createOscillator(), g = ringCtx.createGain(); o.frequency.value = 480; g.gain.value = .055; o.connect(g); g.connect(ringCtx.destination); o.start(); o.stop(ringCtx.currentTime + .32); };
     beep(); ringT = setInterval(beep, 1500);
   } catch (e) {}
 }
-addEventListener('beforeunload', () => { if (call) hangup(); });
+addEventListener('beforeunload', () => {
+  if (call) {
+    try { call.local?.getTracks().forEach(t => t.stop()); call.pc?.close(); } catch (e) {}
+  }
+});
 </script>
 </body>
 </html>
