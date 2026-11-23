@@ -1,272 +1,513 @@
 <!DOCTYPE html>
 <html lang="tk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Sahypa ady -->
-  <title>TDMI One — BratOK</title>
-
-  <!-- Gysgaça düşündiriş (Google-da görünýär) -->
-  <meta name="description" content="TDMI One sahypasy — 102-nji toparyň sapak meýilnamasy, okuw meýilnamalary we beýleki maglumatlar.">
-
-  <!-- Açar sözler -->
-  <meta name="keywords" content="TDMI, Tdmione, sapak meýilnamasy, okuw, talyplar, 102 topar">
-
-  <!-- Sahypa awtory -->
-  <meta name="author" content="Maks">
-
-  <!-- Google-ny sahypaňyza girizmek üçin robots -->
-  <meta name="robots" content="index, follow">
-
-  <!-- Favicon (isleg boýunça) -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-</head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TMChat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-body {
-    margin:0;
-    padding:0;
-    font-family: "Segoe UI", sans-serif;
-    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-    color:#fff;
+:root{--bg:#E6ECF0;--panel:#fff;--ink:#17232E;--muted:#6A7A88;--line:#E3E9ED;--hover:#F1F5F8;--accent:#0F766E;--mine:#CFEFE3;--theirs:#fff;--badge:#C2410C;--font:'Figtree',system-ui,-apple-system,'Segoe UI',sans-serif}
+[data-theme=dark]{--bg:#0E1621;--panel:#17212B;--ink:#E8EEF3;--muted:#8A9BAA;--line:#243140;--hover:#202C38;--accent:#2BA89B;--mine:#1F5C55;--theirs:#202C38}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:var(--font);color:var(--ink);background:var(--bg);font-size:15px;line-height:1.4;-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hidden{display:none!important}
+/* giriş */
+.auth{min-height:100dvh;display:grid;place-items:center;padding:20px}
+.card{background:var(--panel);width:100%;max-width:380px;padding:32px 28px;border-radius:18px;box-shadow:0 10px 40px rgba(23,35,46,.1)}
+.card h1{font-size:28px;font-weight:700;color:var(--accent)}
+.card .sub2{color:var(--muted);margin:4px 0 22px}
+label{display:block;font-weight:600;font-size:13px;margin:14px 0 6px;text-align:left}
+.card input,.mbox input,.mbox textarea{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--hover);resize:none}
+.card input:focus,.mbox input:focus,.mbox textarea:focus{outline:2px solid var(--accent)}
+.btn{width:100%;margin-top:20px;padding:12px;border-radius:10px;background:var(--accent);color:#fff;font-weight:600}
+.btn:disabled{opacity:.6}
+.link{display:block;margin:16px auto 0;color:var(--accent);font-weight:500}
+.err{color:#DC2626;font-size:14px;margin-top:12px;min-height:18px}
+/* esasy */
+.app{display:grid;grid-template-columns:minmax(300px,380px) 1fr;height:100dvh;padding-top:env(safe-area-inset-top,0)}
+.side{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.mehead{display:flex;align-items:center;gap:4px;padding:10px 12px}
+.meb{display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left;font-weight:600;padding:2px;border-radius:12px}
+.meb span.n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ic{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--muted);font-size:18px;flex:none}
+.ic:hover{background:var(--hover)}
+.searchbox{padding:0 16px 10px}
+.searchbox input{width:100%;padding:10px 14px;border:0;border-radius:22px;background:var(--hover)}
+.list{flex:1;overflow-y:auto}
+.lbl{padding:10px 16px 4px;color:var(--accent);font-weight:600;font-size:13px}
+.hint{padding:28px 20px;color:var(--muted);text-align:center}
+.row{display:flex;gap:12px;align-items:center;width:100%;padding:10px 16px;text-align:left}
+.row:hover{background:var(--hover)}
+.row.on{background:var(--accent);color:#fff}
+.row.on .tm,.row.on .sub{color:#E1F5F1}
+.mid{flex:1;min-width:0}
+.top,.bot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.top b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm{font-size:12px;color:var(--muted);flex:none}
+.sub{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.bd{background:var(--badge);color:#fff;border-radius:10px;min-width:20px;padding:0 6px;font-size:12px;font-weight:600;text-align:center;line-height:20px;flex:none}
+.av{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:600;flex:none;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.chat{display:flex;flex-direction:column;min-height:0;min-width:0}
+.empty{flex:1;display:grid;place-content:center;text-align:center;color:var(--muted);padding:24px}
+.empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:4px}
+.pane{flex:1;display:flex;flex-direction:column;min-height:0}
+.head{display:flex;align-items:center;gap:8px;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.hb{display:flex;align-items:center;gap:12px;text-align:left;flex:1;min-width:0}
+.pn{font-weight:600;line-height:1.2}
+.pu{font-size:13px;color:var(--muted)}
+.pu.live{color:var(--accent)}
+.back{display:none;margin-left:-8px}
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:4px}
+.day{align-self:center;background:var(--hover);color:var(--muted);font-size:12px;padding:2px 12px;border-radius:12px;margin:8px 0}
+.b{max-width:min(78%,520px);padding:7px 12px 6px;border-radius:14px;white-space:pre-wrap;word-break:break-word;background:var(--theirs);box-shadow:0 1px 1px rgba(0,0,0,.08)}
+.b.me{align-self:flex-end;background:var(--mine);border-bottom-right-radius:4px}
+.b.them{align-self:flex-start;border-bottom-left-radius:4px}
+.pic{display:block;width:min(280px,62vw);border-radius:10px;cursor:zoom-in;margin-bottom:2px}
+.b audio{display:block;width:min(250px,62vw);height:40px}
+.t{float:right;margin:8px 0 0 12px;font-size:11px;color:var(--muted);white-space:nowrap}
+.del{display:none;clear:both;margin-top:4px;font-size:12px;color:#DC2626}
+.sel .del{display:block}
+.composer,.rec{display:flex;gap:6px;align-items:flex-end;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0));background:var(--panel);border-top:1px solid var(--line)}
+.composer textarea{flex:1;resize:none;max-height:140px;padding:10px 14px;border:0;border-radius:20px;background:var(--hover);line-height:1.4}
+.send{width:42px;height:42px;border-radius:50%;background:var(--accent);display:grid;place-items:center;flex:none}
+.rec{align-items:center;gap:12px}
+.rec .g{flex:1}
+.dot{width:10px;height:10px;border-radius:50%;background:#DC2626;animation:bl 1s infinite}
+@keyframes bl{50%{opacity:.2}}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:grid;place-items:center;z-index:15;padding:16px}
+.mbox{background:var(--panel);border-radius:18px;padding:24px;width:100%;max-width:380px;text-align:center;max-height:92dvh;overflow-y:auto}
+.avedit{position:relative;display:inline-block}
+.avedit i{position:absolute;right:0;bottom:0;background:var(--accent);border-radius:50%;width:32px;height:32px;display:grid;place-items:center;font-style:normal}
+.mbox .av{margin:0 auto}
+.mbox h2{margin-top:12px;font-size:20px}
+.mbox .m{color:var(--muted);font-size:14px;margin-top:2px}
+.mbox p{margin-top:14px;white-space:pre-wrap;word-break:break-word;text-align:left;background:var(--hover);padding:12px;border-radius:10px}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.92);display:grid;place-items:center;z-index:20;cursor:zoom-out}
+.lb img{max-width:95vw;max-height:92vh;border-radius:8px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#17232E;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:30}
+@media(max-width:760px){
+ .app{grid-template-columns:1fr}
+ .app .chat{display:none}
+ .app.open .side{display:none}
+ .app.open .chat{display:flex}
+ .back{display:grid}
 }
-header {
-    text-align:center;
-    padding:25px;
-    background:rgba(0,0,0,0.5);
-    border-bottom:2px solid #4fc3f7;
-}
-header h1{margin:0;font-size:32px;color:#4fc3f7;}
-header p{margin:5px 0 0;font-size:18px;}
-.week{max-width:1100px;margin:30px auto;padding:20px;background:rgba(255,255,255,0.05);border-radius:20px;}
-.week h2{text-align:center;margin-bottom:20px;font-size:26px;color:#ffcc80;border-bottom:1px solid rgba(255,255,255,0.2);padding-bottom:10px;}
-.day-card{margin-bottom:25px;border-radius:15px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.5);}
-.day-header{background:rgba(255,255,255,0.1);padding:10px 15px;font-size:20px;font-weight:bold;color:#fff;}
-table{width:100%;border-collapse:collapse;background:rgba(255,255,255,0.05);}
-th,td{padding:12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.2);}
-th{background:rgba(255,255,255,0.1);}
-tr:hover td{background:rgba(255,255,255,0.1);}
-footer{margin-top:50px;text-align:center;padding:30px;font-size:24px;color:#ffeb3b;}
-.logo{display:inline-block;font-size:60px;font-weight:bold;animation:logoMove 3s infinite alternate;}
-@keyframes logoMove{
-  0%{transform:translateY(0px);}
-  50%{transform:translateY(-15px);}
-  100%{transform:translateY(0px);}
-}
-    .image-section {
-  position: relative;
-  width: 100%;
-  max-width: 800px;
-  margin: 80px auto;
-  overflow: hidden;
-  border-radius: 20px;
-  box-shadow: 0 0 30px rgba(255,255,255,0.1);
-}
-.image-section img {
-  width: 100%;
-  border-radius: 20px;
-  display: block;
-  filter: brightness(85%);
-}
-.image-section {
-  position: relative;
-  width: 70%;       /* suraty kiçeltmek üçin */
-  max-width: 500px; /* iň köp ölçeg */
-  margin: 80px auto; /* gap ýaly ýerleşdirýär */
-  overflow: hidden;
-  border-radius: 25px;
-  box-shadow: 0 0 40px rgba(0,255,255,0.2);
-  border: 5px solid;
-  border-image: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffcc00) 1;
-  animation: borderColor 5s infinite linear;
-}
-
-.image-section img {
-  width: 100%;
-  border-radius: 20px;
-  display: block;
-  filter: brightness(75%);
-}
-
-/* Akyp duran fon gradienti */
-.image-section::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -50%;
-  width: 200%;
-  height: 100%;
-  background: linear-gradient(120deg, #00ffff33, #00ffff00, #00ffff33);
-  animation: shine 4s infinite linear;
-}
-
-/* Ýazgy stili */
-.image-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 36px;
-  font-weight: bold;
-  letter-spacing: 2px;
-  background: linear-gradient(90deg, #00ffff, #ff00ff, #00ff00);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 15px #00ffff;
-  opacity: 0;
-  animation: fadeIn 3s ease forwards, glow 2s infinite alternate;
-}
-
-/* Animasiýalar */
-@keyframes fadeIn {
-  0% { opacity: 0; transform: translate(-50%, -60%); }
-  100% { opacity: 1; transform: translate(-50%, -50%); }
-}
-
-@keyframes glow {
-  from { text-shadow: 0 0 10px #00ffff; }
-  to { text-shadow: 0 0 25px #ff00ff; }
-}
-
-@keyframes shine {
-  0% { left: -50%; }
-  100% { left: 100%; }
-}
-
-@keyframes borderColor {
-  0% { border-image: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffcc00) 1; }
-  25% { border-image: linear-gradient(45deg, #ff00ff, #00ff00, #ffcc00, #00ffff) 1; }
-  50% { border-image: linear-gradient(45deg, #00ff00, #ffcc00, #00ffff, #ff00ff) 1; }
-  75% { border-image: linear-gradient(45deg, #ffcc00, #00ffff, #ff00ff, #00ff00) 1; }
-  100% { border-image: linear-gradient(45deg, #00ffff, #ff00ff, #00ff00, #ffcc00) 1; }
-}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<header>
-<h1>📚 102-nji toparyň raspisanýasy</h1>
-<p id="date"></p>
-</header>
 
-<div class="week" id="week1">
-<h2>1-nji Hepde</h2>
-<div id="days1"></div>
+<div id="auth" class="auth hidden">
+ <div class="card">
+  <h1>TMChat</h1>
+  <p class="sub2">Dostlaryňyz bilen çalt we ýönekeý habarlaşyň</p>
+  <form id="authForm">
+   <div id="signupOnly" class="hidden"><label for="fullname">Adyňyz</label><input id="fullname" autocomplete="name" placeholder="Meselem: Merdan"></div>
+   <label for="username">Ulanyjy ady</label>
+   <input id="username" autocomplete="username" autocapitalize="none" placeholder="merdan_01">
+   <label for="password">Parol</label>
+   <input id="password" type="password" autocomplete="current-password" placeholder="Azyndan 6 simwol">
+   <button class="btn" id="authBtn" type="submit">Girmek</button>
+   <div class="err" id="authErr"></div>
+  </form>
+  <button class="link" id="switch" type="button">Hasabyňyz ýokmy? Hasap açyň</button>
+ </div>
 </div>
 
-<div class="week" id="week2">
-<h2>2-nji Hepde</h2>
-<div id="days2"></div>
+<div id="app" class="app hidden">
+ <aside class="side">
+  <div class="mehead">
+   <button class="meb" id="meBtn"><span id="meAv"></span><span class="n" id="meName"></span></button>
+   <button class="ic" id="theme" aria-label="Tema">◐</button>
+  </div>
+  <div class="searchbox"><input id="search" placeholder="Ady ýa-da ulanyjy ady bilen gözle" autocomplete="off"></div>
+  <div class="list" id="list"></div>
+ </aside>
+ <main class="chat">
+  <div class="empty" id="empty"><div><b>Söhbetdeşlik saýlaň</b>Çepdäki gözleg bilen ulanyjy tapyp, ýazyşyga başlaň.</div></div>
+  <div class="pane hidden" id="pane">
+   <div class="head">
+    <button class="ic back" id="back" aria-label="Yza"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <button class="hb" id="headBtn"><span id="peerAv"></span><span><div class="pn" id="peerName"></div><div class="pu" id="peerSt"></div></span></button>
+   </div>
+   <div class="msgs" id="msgs"></div>
+   <div class="rec hidden" id="rec"><span class="dot"></span><span id="recT">0:00</span><span class="g"></span><button class="ic" id="recX" aria-label="Ýatyr">✕</button><button class="send" id="recOk" aria-label="Ugrat"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M3.4 20.4l17.4-7.5a1 1 0 000-1.8L3.4 3.6a.7.7 0 00-1 .8L4 10.5l9 1.5-9 1.5-1.6 6.1a.7.7 0 001 .8z"/></svg></button></div>
+   <div class="composer" id="comp">
+    <button class="ic" id="clip" aria-label="Surat">📎</button><input type="file" id="file" accept="image/*" hidden>
+    <textarea id="input" rows="1" placeholder="Habar ýazyň..."></textarea>
+    <button class="send" id="sendBtn" aria-label="Ugrat"></button>
+   </div>
+  </div>
+ </main>
 </div>
 
-<footer>
-<span class="logo">TDMI • 2025-2026ý</span>
-</footer>
+<div id="modal" class="modal hidden">
+ <div class="mbox hidden" id="mEdit">
+  <button class="avedit" id="avBtn"><span id="eAv"></span><i>📷</i></button><input type="file" id="avFile" accept="image/*" hidden>
+  <label for="eName">Adyňyz</label><input id="eName" maxlength="40">
+  <label for="eBio">Opisaniýa</label><textarea id="eBio" maxlength="140" rows="3" placeholder="Özüňiz barada ýazyň"></textarea>
+  <div class="m" style="margin-top:10px">@<span id="eUser"></span></div>
+  <button class="btn" id="eSave">Ýatda sakla</button>
+  <button class="link" id="eOut">Hasapdan çykmak</button>
+ </div>
+ <div class="mbox hidden" id="mView">
+  <div id="vAv"></div><h2 id="vName"></h2><div class="m" id="vUser"></div><div class="m" id="vSt"></div><p id="vBio"></p>
+ </div>
+</div>
+<div id="lb" class="lb hidden"><img id="lbImg" alt=""></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const today=new Date();
-const options={weekday:'long',year:'numeric',month:'long',day:'numeric'};
-document.getElementById("date").innerText=today.toLocaleDateString("tk-TM",options);
+/* ====== Supabase > Project Settings > API ýerinden iki bahany goýuň ====== */
+const SUPABASE_URL = 'https://jnhjlhdzaupbzntqqqrx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_KeojhwdI7rBMhTEtCox6SQ_1YOIjxAx';
+/* ======================================================================== */
 
-// 1-nji hepde 6 gün, her gün 3 sapak
-const week1={
-"1-nji gün":[
-{time:"08:30-09:50",subject:"Pedagogika (umumy okuw)",teacher:"Mähemow Ahmet"},
-{time:"10:00-11:20",subject:"Iňlis diliniň amaly grammatikasy (amaly okuw)",teacher:"Ýagmyrow Intizar"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly fonetikasy (amaly okuw)",teacher:"Berdiýewa Ogulsenem"}
-],
-"2-nji gün":[
-{time:"08:30-09:50",subject:"Iňlis diliniň amaly kursy (amaly okuw)",teacher:"Allaýew Toýly"},
-{time:"10:00-11:20",subject:"Häzirki zaman kompýuter tehnologiýalary (tejribe okuw)",teacher:"Altybaýew Umytjan"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly fonetikasy (amaly okuw)",teacher:"Berdiýewa Ogulsenem"}
-],
-"3-nji gün":[
-{time:"08:30-09:50",subject:"HZKT (umumy okuw)",teacher:"Altybaýew Umytjan"},
-{time:"10:00-11:20",subject:"Iňlis diliniň amaly kursy (amaly okuw)",teacher:"Allaýew Toýly"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly grammatikasy (amaly okuw)",teacher:"Ýagmyrow Intizar"}
-],
-"4-nji gün":[
-{time:"08:30-09:50",subject:"Dil bilimine giriş (umumy okuw)",teacher:"Rozyýewa Altyn"},
-{time:"10:00-11:20",subject:"Iňlis diliniň amaly kursy (öý okuwy)(amaly okuw)",teacher:"Allaýew Toýly"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly grammatikasy (amaly okuw)",teacher:"Ýagmyrow Intizar"}
-],
-"5-nji gün":[
-{time:"08:30-09:50",subject:"Psihologiýa (umumy okuw)",teacher:"Jumageldiýewa Sona"},
-{time:"10:00-11:20",subject:"Iňlis diliniň amaly kursy (amaly okuw)",teacher:"Allaýew Toýly"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly fonetikasy (amaly okuw)",teacher:"Berdiýewa Ogulsenem"}
-],
-"6-nji gün":[
-{time:"08:30-09:50",subject:"Pedagogika (söhbet okuwy)",teacher:"Mähemow Ahmet"},
-{time:"10:00-11:20",subject:"Dil bilimine giriş (söhbet okuwy)",teacher:"Mirzoýewa Dilfuza"},
-{time:"11:40-13:00",subject:"Bedenterbiye (amaly okuw)",teacher:"Haýdarow Setdar"}
-]
+if (typeof supabase === 'undefined') {
+  document.getElementById('auth').classList.remove('hidden');
+  document.getElementById('authErr').textContent = 'Supabase kitaphanasy ýüklenmedi. Internet baglanyşygyňyzy barlaň.';
+  throw new Error('supabase-js ýüklenmedi');
+}
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const $ = id => document.getElementById(id);
+let me, peers = {}, msgs = [], active = null, pres = null, mode = 'login', found = [], timer, online = new Set(), typing = {}, lastTyp = 0;
+const SEND = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M3.4 20.4l17.4-7.5a1 1 0 000-1.8L3.4 3.6a.7.7 0 00-1 .8L4 10.5l9 1.5-9 1.5-1.6 6.1a.7.7 0 001 .8z"/></svg>';
+const MIC = '<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 15a3 3 0 003-3V6a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 006 6.9V21h2v-2.1A7 7 0 0019 12z"/></svg>';
+const hues = ['#0F766E','#2563EB','#7C3AED','#BE185D','#C2410C','#4D7C0F','#0E7490'];
+const color = s => hues[[...s].reduce((a, c) => a + c.charCodeAt(0), 0) % hues.length];
+const nm = p => p ? (p.full_name || p.username) : '?';
+const dn = p => me && p.id === me.id ? 'Saklanan habarlar' : nm(p);
+const fmtTime = d => new Date(d).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+const sameDay = (a, b) => a.toDateString() === b.toDateString();
+const fmtList = d => sameDay(new Date(d), new Date()) ? fmtTime(d) : new Date(d).toLocaleDateString([], {day: '2-digit', month: '2-digit'});
+const dayLbl = d => { const x = new Date(d), n = new Date(); return sameDay(x, n) ? 'Şu gün' : sameDay(x, new Date(n - 864e5)) ? 'Düýn' : x.toLocaleDateString([], {day: 'numeric', month: 'long', year: 'numeric'}); };
+function toast(t) { const d = document.createElement('div'); d.className = 'toast'; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 3500); }
+function avatar(p, s) {
+  const d = document.createElement('div'); d.className = 'av';
+  if (s) d.style.cssText = `width:${s}px;height:${s}px;font-size:${s / 2.6}px`;
+  if (p.avatar_url) { const i = new Image(); i.src = p.avatar_url; i.alt = ''; d.append(i); }
+  else { d.style.background = color(p.username || ''); d.textContent = nm(p).trim().split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase(); }
+  return d;
+}
+function stat(p) {
+  if (p.id === me.id) return '';
+  if ((typing[p.id] || 0) > Date.now()) return 'ýazýar...';
+  if (online.has(p.id)) return 'onlaýn';
+  return p.last_seen ? 'soňky gezek: ' + fmtList(p.last_seen) : '';
+}
+/* surat kiçeltmek (traffic tygşytlaýar) */
+function shrink(file, max, q = .82) {
+  return new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => {
+      const r = Math.min(1, max / Math.max(i.width, i.height)), c = document.createElement('canvas');
+      c.width = i.width * r; c.height = i.height * r;
+      c.getContext('2d').drawImage(i, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(i.src); c.toBlob(b => b ? res(b) : rej(new Error('Surat okalmady')), 'image/jpeg', q);
+    };
+    i.onerror = () => rej(new Error('Surat okalmady')); i.src = URL.createObjectURL(file);
+  });
+}
+async function upload(bucket, path, blob, type, upsert) {
+  const {error} = await sb.storage.from(bucket).upload(path, blob, {contentType: type, upsert: !!upsert});
+  if (error) throw error;
+  return sb.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+}
+/* tema */
+const setTheme = t => { document.documentElement.dataset.theme = t; try { localStorage.setItem('tm-theme', t); } catch {} };
+let th; try { th = localStorage.getItem('tm-theme'); } catch {}
+setTheme(th || (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light'));
+$('theme').onclick = () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+
+/* ---------- giriş ---------- */
+function showAuth(e) { $('app').classList.add('hidden'); $('auth').classList.remove('hidden'); $('authErr').textContent = e || ''; }
+function setMode(m) {
+  mode = m; $('signupOnly').classList.toggle('hidden', m === 'login');
+  $('authBtn').textContent = m === 'login' ? 'Girmek' : 'Hasap açmak';
+  $('switch').textContent = m === 'login' ? 'Hasabyňyz ýokmy? Hasap açyň' : 'Hasabyňyz barmy? Giriň';
+  $('authErr').textContent = '';
+}
+$('switch').onclick = () => setMode(mode === 'login' ? 'signup' : 'login');
+$('authForm').onsubmit = async e => {
+  e.preventDefault();
+  const err = t => $('authErr').textContent = t;
+  const u = $('username').value.trim().toLowerCase(), pw = $('password').value;
+  if (!/^[a-z0-9_]{3,20}$/.test(u)) return err('Ulanyjy ady: 3–20 simwol, diňe a-z, 0-9 we _ ulanyň');
+  if (pw.length < 6) return err('Parol azyndan 6 simwol bolmaly');
+  const email = u + '@users.tmchat.app';
+  $('authBtn').disabled = true; err('');
+  let r;
+  if (mode === 'signup') {
+    r = await sb.auth.signUp({email, password: pw, options: {data: {username: u, full_name: $('fullname').value.trim() || u}}});
+    if (!r.error && !r.data.session) r = await sb.auth.signInWithPassword({email, password: pw});
+  } else r = await sb.auth.signInWithPassword({email, password: pw});
+  $('authBtn').disabled = false;
+  if (r.error) {
+    const m = r.error.message;
+    err(/Invalid login/i.test(m) ? 'Ulanyjy ady ýa-da parol ýalňyş' : /already registered/i.test(m) ? 'Bu ulanyjy ady eýýäm alnan' : /not confirmed/i.test(m) ? 'Supabase-de "Confirm email" opsiýasyny öçüriň' : m);
+  } else boot(r.data.user);
 };
 
-// 2-nji hepde 6 gün, her gün 3 sapak
-const week2={
-"1-nji gün":[
-{time:"08:30-09:50",subject:"Türkmenistanyñ taryhy (umumy okuw)",teacher:"Agalyýew Eziz"},
-{time:"10:00-11:20",subject:"Iňlis diliniň amaly grammatikasy (amaly okuw)",teacher:"Ýagmyrow Intizar"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly fonetikasy (amaly okuw)",teacher:"Berdiýewa Ogulsenem"}
-],
-"2-nji gün":[
-{time:"08:30-09:50",subject:"Iňlis diliniň amaly kursy (amaly okuw)",teacher:"Allaýew Toýly"},
-{time:"10:00-11:20",subject:"Häzirki zaman kompýuter tehnologiýalary (tejribe okuw)",teacher:"Ýagmyrow Intizar"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly fonetikasy (amaly okuw)",teacher:"Berdiýewa Ogulsenem"}
-],
-"3-nji gün":[
-{time:"08:30-09:50",subject:"Häzirki zaman kompýuter tehnologiýalary (umumy okuw)",teacher:"Altybaýew Umytjan"},
-{time:"10:00-11:20",subject:"Iňlis diliniň amaly kursy (amaly okuw)",teacher:"Allaýew Toýly"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly grammatikasy (amaly okuw)",teacher:"Ýagmyrow Intizar"}
-],
-"4-nji gün":[
-{time:"08:30-09:50",subject:"Dil bilimine giriş (umumy okuw)",teacher:"Rozyýewa Altyn"},
-{time:"10:00-11:20",subject:"Iňlis diliniň amaly kursy (öý okuwy)(amaly okuw)",teacher:"Allaýew Toýly"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly grammatikasy (amaly okuw)",teacher:"Ýagmyrow Intizar"}
-],
-"5-nji gün":[
-{time:"08:30-09:50",subject:"Türkmenistanyñ taryhy (söhbet okuwy)",teacher:"Agalyýew Eziz"},
-{time:"10:00-11:20",subject:"Iňlis diliniň amaly kursy (amaly okuw)",teacher:"Allaýew Toýly"},
-{time:"11:40-13:00",subject:"Iňlis diliniň amaly fonetikasy (amaly okuw)",teacher:"Berdiýewa Ogulsenem"}
-],
-"6-nji gün":[
-{time:"08:30-09:50",subject:"Psihologiya (söhbet okuwy)",teacher:"Allakow Mars"},
-{time:"10:00-11:20",subject:"Dil bilimine giriş (söhbet okuwy)",teacher:"Mirzoýewa Dilfuza"},
-{time:"11:40-13:00",subject:"Bedenterbiye (amaly okuw)",teacher:"Haýdarow Setdar"}
-]
+/* ---------- başlamak ---------- */
+async function boot(user) {
+  const {data: p, error} = await sb.from('profiles').select('*').eq('id', user.id).single();
+  if (error) return showAuth('Profil tapylmady. schema.sql we update.sql skriptleriniň işledilendigini barlaň.');
+  me = p; peers = {[me.id]: me}; msgs = []; active = null;
+  $('auth').classList.add('hidden'); $('app').classList.remove('hidden');
+  refreshMe();
+  const {data: m} = await sb.from('messages').select('*').order('created_at').limit(2000);
+  msgs = m || [];
+  await loadPeers(msgs.map(x => x.sender_id === me.id ? x.receiver_id : x.sender_id));
+  renderList(); renderChat(); realtime();
+  const ping = () => sb.from('profiles').update({last_seen: new Date().toISOString()}).eq('id', me.id);
+  ping(); setInterval(ping, 120000); addEventListener('pagehide', ping);
+}
+async function loadPeers(ids) {
+  ids = [...new Set(ids)].filter(i => !peers[i]);
+  if (!ids.length) return;
+  const {data} = await sb.from('profiles').select('*').in('id', ids);
+  (data || []).forEach(p => peers[p.id] = p);
+}
+function refreshMe() {
+  $('meName').textContent = nm(me); $('meAv').replaceChildren(avatar(me, 40)); peers[me.id] = me;
+  if (active) renderChat(); renderList();
+}
+
+/* ---------- realtime ---------- */
+function realtime() {
+  sb.channel('tm-msgs')
+    .on('postgres_changes', {event: 'INSERT', schema: 'public', table: 'messages'}, pl => onNew(pl.new))
+    .on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'messages'}, pl => {
+      const m = msgs.find(x => x.id === pl.new.id);
+      if (m) { m.is_read = pl.new.is_read; renderList(); if (active) renderChat(); }
+    })
+    .on('postgres_changes', {event: 'DELETE', schema: 'public', table: 'messages'}, pl => {
+      msgs = msgs.filter(x => x.id !== pl.old.id); renderList(); if (active) renderChat();
+    }).subscribe();
+  pres = sb.channel('tm-presence', {config: {presence: {key: me.id}}})
+    .on('presence', {event: 'sync'}, () => {
+      const old = online; online = new Set(Object.keys(pres.presenceState()));
+      old.forEach(id => { if (!online.has(id) && peers[id]) peers[id].last_seen = new Date().toISOString(); });
+      renderHead();
+    })
+    .on('broadcast', {event: 'typing'}, ({payload}) => {
+      if (payload.to !== me.id) return;
+      typing[payload.from] = Date.now() + 3000; renderHead(); setTimeout(renderHead, 3100);
+    })
+    .subscribe(s => { if (s === 'SUBSCRIBED') pres.track({at: Date.now()}); });
+}
+async function onNew(m) {
+  if (m.sender_id !== me.id && m.receiver_id !== me.id) return;
+  const peer = m.sender_id === me.id ? m.receiver_id : m.sender_id;
+  await loadPeers([peer]);
+  if (msgs.some(x => x.id === m.id)) return;
+  msgs.push(m);
+  if (active === peer && m.receiver_id === me.id) markRead(peer);
+  renderList(); if (active === peer) renderChat(true);
+}
+async function markRead(peer) {
+  const un = msgs.filter(m => m.sender_id === peer && m.receiver_id === me.id && !m.is_read);
+  if (!un.length) return;
+  un.forEach(m => m.is_read = true); renderList();
+  await sb.from('messages').update({is_read: true}).eq('sender_id', peer).eq('receiver_id', me.id).eq('is_read', false);
+}
+
+/* ---------- çep sütün ---------- */
+function convos() {
+  const map = {};
+  msgs.forEach(m => {
+    const id = m.sender_id === me.id ? m.receiver_id : m.sender_id;
+    const c = map[id] || (map[id] = {id, last: m, unread: 0});
+    c.last = m; if (m.receiver_id === me.id && !m.is_read) c.unread++;
+  });
+  return Object.values(map).sort((a, b) => new Date(b.last.created_at) - new Date(a.last.created_at));
+}
+function row(p, sub, time, unread) {
+  const b = document.createElement('button'); b.className = 'row' + (active === p.id ? ' on' : '');
+  const mid = document.createElement('div'); mid.className = 'mid';
+  const top = document.createElement('div'); top.className = 'top';
+  const n = document.createElement('b'); n.textContent = dn(p);
+  const tm = document.createElement('span'); tm.className = 'tm'; tm.textContent = time;
+  top.append(n, tm);
+  const bot = document.createElement('div'); bot.className = 'bot';
+  const s = document.createElement('span'); s.className = 'sub'; s.textContent = sub; bot.append(s);
+  if (unread) { const d = document.createElement('span'); d.className = 'bd'; d.textContent = unread; bot.append(d); }
+  mid.append(top, bot); b.append(avatar(p), mid);
+  b.onclick = () => { peers[p.id] = peers[p.id] || p; openChat(p.id); };
+  return b;
+}
+function renderList() {
+  if (!me) return;
+  const q = $('search').value.trim().toLowerCase().replace(/^@/, '');
+  const box = $('list'); box.replaceChildren();
+  const all = convos();
+  $('meBtn').title = ''; document.title = (all.reduce((s, c) => s + c.unread, 0) ? '(' + all.reduce((s, c) => s + c.unread, 0) + ') ' : '') + 'TMChat';
+  const cs = all.filter(c => { const p = peers[c.id]; return p && (!q || dn(p).toLowerCase().includes(q) || p.username.includes(q)); });
+  if (!q && !all.some(c => c.id === me.id)) box.append(row(me, 'Öz-özüňize ýazyň', '', 0));
+  cs.forEach(c => box.append(row(peers[c.id], (c.last.sender_id === me.id ? 'Siz: ' : '') + c.last.content, fmtList(c.last.created_at), c.unread)));
+  if (q) {
+    const ids = new Set(cs.map(c => c.id)), fr = found.filter(p => !ids.has(p.id));
+    if (fr.length) { const l = document.createElement('div'); l.className = 'lbl'; l.textContent = 'Başga ulanyjylar'; box.append(l); fr.forEach(p => box.append(row(p, '@' + p.username, '', 0))); }
+    else if (!cs.length) { const h = document.createElement('div'); h.className = 'hint'; h.textContent = 'Hiç kim tapylmady'; box.append(h); }
+  } else if (!all.length) { const h = document.createElement('div'); h.className = 'hint'; h.textContent = 'Heniz ýazyşyk ýok. Ýokardaky gözleg bilen dostuňyzy tapyň.'; box.append(h); }
+}
+$('search').oninput = () => {
+  renderList(); clearTimeout(timer);
+  const q = $('search').value.trim().toLowerCase().replace(/^@/, '').replace(/[%\\,()*]/g, '');
+  if (!q) { found = []; return; }
+  timer = setTimeout(async () => {
+    const {data} = await sb.from('profiles').select('*').or(`username.ilike.%${q}%,full_name.ilike.%${q}%`).neq('id', me.id).limit(15);
+    found = data || []; renderList();
+  }, 300);
 };
 
-function renderWeek(weekData, containerId){
-const container=document.getElementById(containerId);
-for(let day in weekData){
-let card=document.createElement("div");
-card.className="day-card";
-let header=document.createElement("div");
-header.className="day-header";
-header.innerText=day;
-let table=document.createElement("table");
-let thead=document.createElement("thead");
-thead.innerHTML="<tr><th>Wagt</th><th>Sapak</th><th>Mugallym</th></tr>";
-table.appendChild(thead);
-let tbody=document.createElement("tbody");
-weekData[day].forEach(lesson=>{
-let row=document.createElement("tr");
-row.innerHTML=`<td>${lesson.time}</td><td>${lesson.subject}</td><td>${lesson.teacher}</td>`;
-tbody.appendChild(row);
-});
-table.appendChild(tbody);
-card.appendChild(header);
-card.appendChild(table);
-container.appendChild(card);
+/* ---------- sag tarap ---------- */
+function openChat(id) {
+  active = id; $('app').classList.add('open'); markRead(id); renderChat(true); renderList();
+  if (id !== me.id) sb.from('profiles').select('*').eq('id', id).single().then(({data}) => { if (data && peers[id]) { Object.assign(peers[id], data); renderHead(); renderList(); } });
+  if (matchMedia('(min-width:761px)').matches) $('input').focus();
 }
+$('back').onclick = () => { active = null; $('app').classList.remove('open'); renderList(); renderChat(); };
+function renderHead() {
+  const p = peers[active]; if (!p) return;
+  const s = stat(p); $('peerSt').textContent = s; $('peerSt').classList.toggle('live', s === 'onlaýn' || s === 'ýazýar...');
+}
+function bubble(m) {
+  const mine = m.sender_id === me.id, d = document.createElement('div'); d.className = 'b ' + (mine ? 'me' : 'them');
+  if (m.kind === 'image') {
+    const i = new Image(); i.src = m.media_url; i.loading = 'lazy'; i.alt = ''; i.className = 'pic';
+    i.onclick = e => { e.stopPropagation(); $('lbImg').src = m.media_url; $('lb').classList.remove('hidden'); };
+    d.append(i);
+    if (m.content && m.content !== '📷 Surat') { const c = document.createElement('div'); c.textContent = m.content; d.append(c); }
+  } else if (m.kind === 'voice') {
+    const a = document.createElement('audio'); a.controls = true; a.preload = 'metadata'; a.src = m.media_url; d.append(a);
+  } else { const t = document.createElement('span'); t.textContent = m.content; d.append(t); }
+  const tm = document.createElement('span'); tm.className = 't'; tm.textContent = fmtTime(m.created_at) + (mine ? (m.is_read ? ' ✓✓' : ' ✓') : ''); d.append(tm);
+  if (mine) {
+    const x = document.createElement('button'); x.className = 'del'; x.textContent = 'Pozmak';
+    x.onclick = e => { e.stopPropagation(); delMsg(m); }; d.append(x);
+    d.onclick = () => d.classList.toggle('sel');
+  }
+  return d;
+}
+function renderChat(force) {
+  const p = peers[active];
+  $('empty').classList.toggle('hidden', !!p); $('pane').classList.toggle('hidden', !p);
+  if (!p) return;
+  $('peerName').textContent = dn(p); $('peerAv').replaceChildren(avatar(p, 40)); renderHead();
+  const box = $('msgs'), near = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  box.replaceChildren(); let last = '';
+  msgs.filter(m => (m.sender_id === active && m.receiver_id === me.id) || (m.sender_id === me.id && m.receiver_id === active)).forEach(m => {
+    const dl = dayLbl(m.created_at);
+    if (dl !== last) { last = dl; const s = document.createElement('div'); s.className = 'day'; s.textContent = dl; box.append(s); }
+    box.append(bubble(m));
+  });
+  if (near || force === true) box.scrollTop = box.scrollHeight;
+}
+async function delMsg(m) {
+  if (!confirm('Habary pozmalymy?')) return;
+  const {error} = await sb.from('messages').delete().eq('id', m.id);
+  if (error) return toast(error.message);
+  msgs = msgs.filter(x => x.id !== m.id); renderList(); renderChat();
 }
 
-renderWeek(week1,"days1");
-renderWeek(week2,"days2");
+/* ---------- ibermek ---------- */
+async function post(content, kind = 'text', media_url = null, duration = null) {
+  const {data, error} = await sb.from('messages').insert({sender_id: me.id, receiver_id: active, content, kind, media_url, duration, is_read: active === me.id}).select().single();
+  if (error) { toast('Habar ibermedi: ' + error.message); return false; }
+  if (!msgs.some(x => x.id === data.id)) msgs.push(data);
+  renderList(); renderChat(true); return true;
+}
+async function sendText() {
+  const ta = $('input'), text = ta.value.trim(); if (!text || !active) return;
+  ta.value = ''; ta.style.height = ''; syncBtn();
+  if (!await post(text)) { ta.value = text; syncBtn(); }
+}
+function syncBtn() { $('sendBtn').innerHTML = $('input').value.trim() ? SEND : MIC; }
+$('sendBtn').onclick = () => $('input').value.trim() ? sendText() : recStart();
+$('input').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !matchMedia('(pointer:coarse)').matches) { e.preventDefault(); sendText(); } };
+$('input').oninput = e => {
+  e.target.style.height = 'auto'; e.target.style.height = Math.min(e.target.scrollHeight, 140) + 'px'; syncBtn();
+  if (active && active !== me.id && pres && Date.now() - lastTyp > 2500) { lastTyp = Date.now(); pres.send({type: 'broadcast', event: 'typing', payload: {from: me.id, to: active}}); }
+};
+syncBtn();
+$('clip').onclick = () => $('file').click();
+$('file').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f || !active) return;
+  toast('Surat ugradylýar...');
+  try {
+    const url = await upload('chat-media', `${me.id}/${crypto.randomUUID()}.jpg`, await shrink(f, 1280), 'image/jpeg');
+    const cap = $('input').value.trim(); $('input').value = ''; syncBtn();
+    await post(cap || '📷 Surat', 'image', url);
+  } catch (x) { toast('Surat ugradylmady: ' + (x.message || x)); }
+};
+/* ses habary */
+let rc = null, chunks = [], rt0 = 0, rti;
+async function recStart() {
+  if (!active) return;
+  try {
+    const st = await navigator.mediaDevices.getUserMedia({audio: true});
+    rc = new MediaRecorder(st, {mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'});
+    chunks = []; rc.ondataavailable = e => chunks.push(e.data); rc.start(); rt0 = Date.now();
+    $('rec').classList.remove('hidden'); $('comp').classList.add('hidden');
+    rti = setInterval(() => { const s = Math.floor((Date.now() - rt0) / 1e3); $('recT').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }, 250);
+  } catch { toast('Mikrofona ygtyýar berilmedi (https ýa-da localhost gerek)'); }
+}
+function recStop(go) {
+  clearInterval(rti); const r = rc; if (!r) return; rc = null;
+  const dur = Math.round((Date.now() - rt0) / 1e3);
+  r.onstop = async () => {
+    r.stream.getTracks().forEach(t => t.stop());
+    if (!go || dur < 1) return;
+    try {
+      const type = r.mimeType.split(';')[0];
+      const url = await upload('chat-media', `${me.id}/${crypto.randomUUID()}.${type.includes('webm') ? 'webm' : 'm4a'}`, new Blob(chunks, {type}), type);
+      await post('🎤 Ses habary', 'voice', url, dur);
+    } catch (x) { toast('Ses ugradylmady: ' + (x.message || x)); }
+  };
+  r.stop(); $('rec').classList.add('hidden'); $('comp').classList.remove('hidden');
+}
+$('recX').onclick = () => recStop(false); $('recOk').onclick = () => recStop(true);
+
+/* ---------- profil ---------- */
+const show = id => { $('modal').classList.remove('hidden'); ['mEdit', 'mView'].forEach(k => $(k).classList.toggle('hidden', k !== id)); };
+$('modal').onclick = e => { if (e.target === $('modal')) $('modal').classList.add('hidden'); };
+$('lb').onclick = () => $('lb').classList.add('hidden');
+$('meBtn').onclick = () => {
+  $('eAv').replaceChildren(avatar(me, 96)); $('eName').value = me.full_name || ''; $('eBio').value = me.bio || ''; $('eUser').textContent = me.username; show('mEdit');
+};
+$('headBtn').onclick = () => {
+  const p = peers[active]; if (!p) return; if (p.id === me.id) return $('meBtn').click();
+  $('vAv').replaceChildren(avatar(p, 110)); $('vName').textContent = nm(p); $('vUser').textContent = '@' + p.username;
+  $('vSt').textContent = stat(p); $('vBio').textContent = p.bio || 'Opisaniýa ýok'; show('mView');
+};
+$('avBtn').onclick = () => $('avFile').click();
+$('avFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const url = await upload('avatars', `${me.id}/avatar.jpg`, await shrink(f, 360, .85), 'image/jpeg', true) + '?v=' + Date.now();
+    const {error} = await sb.from('profiles').update({avatar_url: url}).eq('id', me.id); if (error) throw error;
+    me.avatar_url = url; $('eAv').replaceChildren(avatar(me, 96)); refreshMe();
+  } catch (x) { toast('Surat ýüklenmedi: ' + (x.message || x)); }
+};
+$('eSave').onclick = async () => {
+  const full_name = $('eName').value.trim() || me.username, bio = $('eBio').value.trim();
+  const {error} = await sb.from('profiles').update({full_name, bio}).eq('id', me.id);
+  if (error) return toast(error.message);
+  Object.assign(me, {full_name, bio}); refreshMe(); $('modal').classList.add('hidden'); toast('Ýatda saklandy');
+};
+$('eOut').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+/* ---------- start ---------- */
+if (SUPABASE_URL.includes('YOUR-PROJECT')) showAuth('Faýlyň başyndaky SUPABASE_URL we SUPABASE_ANON_KEY bahalaryny dolduryň.');
+else sb.auth.getSession().then(({data}) => data.session ? boot(data.session.user) : showAuth());
 </script>
-<!-- Animasiýaly surat bölegi -->
-<div class="image-section">
-  <img src="https://i.supaimg.com/683da27b-a5b7-4fb6-b2fb-e1644bd57bb4.jpg" alt="Surat">
-  <div class="image-text">By: BratOK</div>
-</div>
 </body>
 </html>
