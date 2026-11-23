@@ -271,8 +271,19 @@ $('authForm').onsubmit = async e => {
 
 /* ---------- başlamak ---------- */
 async function boot(user) {
-  const {data: p, error} = await sb.from('profiles').select('*').eq('id', user.id).single();
-  if (error) return showAuth('Profil tapylmady. schema.sql we update.sql skriptleriniň işledilendigini barlaň.');
+  let {data: p, error} = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+  if (!error && !p) { // profil ýok bolsa, awtomatiki döredýäris
+    const md = user.user_metadata || {};
+    let u = String(md.username || (user.email || '').split('@')[0]).toLowerCase().replace(/[^a-z0-9_]/g, '');
+    if (u.length < 3) u = 'user' + Math.random().toString(36).slice(2, 8);
+    for (let i = 0; i < 3; i++) {
+      const r = await sb.from('profiles').insert({id: user.id, username: u, full_name: md.full_name || u}).select().single();
+      if (!r.error) { p = r.data; break; }
+      if (r.error.code === '23505') u = u.slice(0, 14) + Math.random().toString(36).slice(2, 7);
+      else { error = r.error; break; }
+    }
+  }
+  if (error || !p) return showAuth('Profil döredilmedi' + (error ? ': ' + error.message : '') + '. tmchat.sql skriptini işledip görüň.');
   me = p; peers = {[me.id]: me}; msgs = []; active = null;
   $('auth').classList.add('hidden'); $('app').classList.remove('hidden');
   refreshMe();
