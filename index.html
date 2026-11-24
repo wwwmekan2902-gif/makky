@@ -2,7 +2,8 @@
 <html lang="tk" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover,interactive-widget=resizes-content">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0b0f1a">
 <title>TMChat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -182,6 +183,26 @@ main{transform:translateX(100%)}.app.open main{transform:none}.app.open aside{tr
 .mem{width:100%;max-height:200px;overflow:auto;text-align:left;display:grid;gap:4px}.mem label{display:flex;gap:10px;align-items:center;padding:4px}.mem .av{width:34px;height:34px;font-size:13px}.mem input,.sp input{width:auto}
 .btn2{background:var(--el);border:1px solid var(--bd);border-radius:12px;padding:11px 16px;font-weight:600}.pfc .btn,.pfc .btn2,.pfc select{width:100%}.pfc select{padding:11px;border-radius:12px;background:var(--el);color:var(--t);border:1px solid var(--bd)}
 .str{height:4px;background:var(--el);border-radius:4px;overflow:hidden}.str i{display:block;height:100%;width:0;transition:.2s}#uh{font-size:12px;margin-top:-8px}.sp{font-size:13px;color:var(--m);display:flex;gap:8px;align-items:center}
+</style>
+<style>
+/* ===== v3: app ýaly ekran ===== */
+html,body{position:fixed;inset:0;width:100%;height:100%;overflow:hidden;overscroll-behavior:none;touch-action:manipulation;-webkit-text-size-adjust:100%;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,select{font-size:16px!important;-webkit-user-select:text;user-select:text}
+.app{position:fixed;top:0;left:0;width:100%;height:var(--vh,100dvh)!important}
+#msgs,#list,#sbar{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}#msgs{scroll-behavior:auto}
+img{-webkit-user-drag:none}
+.m{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:filter .15s,transform .15s}
+.m.sel{position:relative;z-index:91;transform:scale(.97);filter:brightness(1.2)}
+.gn{flex:0 0 100%}
+.rq{flex:0 0 100%;display:grid;border-left:3px solid var(--a2);background:#ffffff22;border-radius:8px;padding:4px 8px;margin-bottom:5px;font-size:13px;cursor:pointer}
+.rq b{font-size:12px;color:var(--a2)}.rq span{opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmb{position:fixed;inset:0;z-index:89;background:#0005}
+#cm{position:fixed;z-index:90;width:214px;background:var(--pane);border:1px solid var(--bd);border-radius:16px;box-shadow:var(--shadow);padding:6px;animation:pop .14s}
+#cm button{display:flex;gap:12px;align-items:center;width:100%;padding:11px 12px;border-radius:10px;font-weight:500;text-align:left}
+#cm button:active{background:var(--el)}#cm .d{color:var(--r)}
+#rbar{position:absolute;left:0;right:0;bottom:100%;display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--side);border-top:1px solid var(--bd)}
+#rbar>div{flex:1;min-width:0;display:grid;border-left:3px solid var(--a);padding-left:10px}
+#rbar b{font-size:13px;color:var(--a2)}#rbar span{font-size:13px;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body>
@@ -914,6 +935,117 @@ async function groupInfo(g) {
     await (own ? sb.from('groups').delete().eq('id', g.id) : sb.from('group_members').delete().eq('group_id', g.id).eq('user_id', me.id));
     closePF(); if (peer?.id === g.id) $('#back').click(); loadUsers(); };
 }
+</script>
+<script>
+/* ===== TMChat v3: app ekran, uzak basyp menýu, diňe öz söhbetdeşler, serwer gözlegi ===== */
+(() => {
+const mob = () => matchMedia('(max-width:760px)').matches;
+/* ekran doňup durýar: zoom ýok, klawiatura bilen çykýar */
+const vv = window.visualViewport;
+const setVh = () => { document.documentElement.style.setProperty('--vh', (vv ? vv.height : innerHeight) + 'px'); scrollTo(0, 0); if (peer && document.activeElement === txt) bottom(true); };
+if (vv) { vv.addEventListener('resize', setVh); vv.addEventListener('scroll', () => scrollTo(0, 0)); } setVh();
+['gesturestart', 'gesturechange', 'gestureend'].forEach(e => document.addEventListener(e, x => x.preventDefault()));
+document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, {passive: false});
+let noF = false; const _f = txt.focus.bind(txt); txt.focus = o => { if (!(noF && mob())) _f(o); };
+
+/* diňe ýazyşan adamlar; beýlekileri gözleg bilen tapýar */
+let found = [], qt;
+const _rl = renderList;
+renderList = function () {
+  const q = $('#q').value.trim(), full = users;
+  users = q ? [...full, ...found.filter(f => !full.some(u => u.id === f.id))] : full.filter(u => last[u.id] || myFol.has(u.id) || peer?.id === u.id);
+  try { _rl(); } finally { users = full; }
+  const e = $('#list .empt'); if (e) e.textContent = q ? 'Hiç kim tapylmady' : 'Heniz söhbet ýok. Ýokarda ulanyjy ady bilen gözläp tapyň.';
+};
+$('#q').placeholder = 'Ulanyjy ady bilen gözleg…';
+$('#q').oninput = () => {
+  renderList(); clearTimeout(qt); const q = $('#q').value.trim().replace(/^@/, '');
+  if (q.length < 2) { found = []; return; }
+  qt = setTimeout(async () => { const {data} = await sb.rpc('search_users', {q}); if ($('#q').value.trim().replace(/^@/, '') !== q) return; found = data || []; renderList(); }, 250);
+};
+$('#list').onclick = e => {
+  const b = e.target.closest('.u'); if (!b) return; const id = b.dataset.id, u = all().find(x => x.id === id) || found.find(x => x.id === id); if (!u) return;
+  if (!u.is_group && !users.some(x => x.id === id)) users.push(u);
+  $('#q').value = ''; found = []; openChat(u);
+};
+
+/* habar: jogap, üýtgediş, pozmak */
+const MM = new Map(); let replyTo = null, editing = null, selEl = null, cmT = 0;
+const _bub = bubble;
+bubble = function (m) {
+  MM.set(String(m.id), m); const d = _bub(m); d.querySelector('.dx')?.remove();
+  if (m.reply_to) { const r = MM.get(String(m.reply_to)), q = document.createElement('div'); q.className = 'rq'; q.dataset.go = m.reply_to;
+    q.innerHTML = r ? `<b>${esc(nm(gu(r.sender_id)))}</b><span>${esc(prev(r))}</span>` : '<span>Habar</span>';
+    const g = d.querySelector('.gn'); g ? g.after(q) : d.prepend(q); }
+  if (m.edited_at) d.querySelector('.mt')?.prepend('üýtgedildi ');
+  return d;
+};
+const _am = addMsg; addMsg = function (m, q) { if (m.deleted_for?.includes(me.id)) return; _am(m, q); };
+function applyEdit(m) {
+  MM.set(String(m.id), m); const el = document.querySelector(`.m[data-id="${m.id}"]`), tx = el?.querySelector('.tx'); if (!tx) return;
+  tx.innerHTML = esc(m.content).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  const t = el.querySelector('.mt'); if (t && !t.dataset.e) { t.dataset.e = 1; t.prepend('üýtgedildi '); }
+}
+$('#msgs').addEventListener('click', e => { const q = e.target.closest('.rq'); if (q) document.querySelector(`.m[data-id="${q.dataset.go}"]`)?.scrollIntoView({block: 'center'}); });
+
+const cm = document.createElement('div'), bk = document.createElement('div'); cm.id = 'cm'; bk.id = 'cmb'; cm.className = bk.className = 'hide'; document.body.append(bk, cm);
+const rb = document.createElement('div'); rb.id = 'rbar'; rb.className = 'hide'; rb.innerHTML = '<div><b></b><span></span></div><button class="ib">✕</button>'; $('#cmp').append(rb);
+const showBar = (t, s) => { rb.querySelector('b').textContent = t; rb.querySelector('span').textContent = s; rb.classList.remove('hide'); };
+const clearBar = () => { replyTo = editing = null; rb.classList.add('hide'); };
+rb.querySelector('button').onclick = () => { if (editing) { txt.value = ''; fit(); toggleSend(); } clearBar(); };
+function closeCM() { cm.classList.add('hide'); bk.classList.add('hide'); selEl?.classList.remove('sel'); selEl = null; }
+bk.onclick = bk.oncontextmenu = e => { e.preventDefault(); closeCM(); };
+async function copy(t) { try { await navigator.clipboard.writeText(t); } catch (e) { const a = document.createElement('textarea'); a.value = t; document.body.append(a); a.select(); document.execCommand('copy'); a.remove(); } }
+function openCM(el) {
+  const m = MM.get(el.dataset.id); if (!m || !cm.classList.contains('hide')) return;
+  cmT = Date.now(); selEl = el; el.classList.add('sel'); navigator.vibrate?.(12);
+  const mine = m.sender_id === me.id, txtM = (m.kind || 'text') === 'text', it = [['reply', '↩', 'Jogap bermek']];
+  if (txtM) it.push(['copy', '⧉', 'Göçürmek']);
+  if (m.media_url) it.push(['save', '⬇', 'Ýüklemek']);
+  if (mine && txtM) it.push(['edit', '✎', 'Üýtgetmek']);
+  it.push(['delme', '🙈', 'Menden pozmak']); if (mine) it.push(['delall', '🗑', 'Hemmeler üçin pozmak', 'd']);
+  cm.innerHTML = it.map(([k, i, t, c]) => `<button data-k="${k}" class="${c || ''}"><span>${i}</span>${t}</button>`).join('');
+  const r = el.getBoundingClientRect(), H = vv ? vv.height : innerHeight, W = innerWidth, h = it.length * 46 + 12;
+  let x = mine ? r.right - 214 : r.left, y = r.bottom + 8; x = Math.max(8, Math.min(x, W - 222)); if (y + h > H - 8) y = r.top - h - 8; if (y < 8) y = Math.max(8, (H - h) / 2);
+  cm.style.left = x + 'px'; cm.style.top = y + 'px'; cm.classList.remove('hide'); bk.classList.remove('hide');
+  cm.onclick = async ev => {
+    const k = ev.target.closest('button')?.dataset.k; if (!k) return; closeCM();
+    if (k === 'reply') { editing = null; replyTo = m; showBar('↩ ' + nm(gu(m.sender_id)), prev(m)); txt.focus(); }
+    else if (k === 'copy') copy(m.content);
+    else if (k === 'save') { const a = document.createElement('a'); a.href = m.media_url; a.download = m.content || ''; a.target = '_blank'; a.click(); }
+    else if (k === 'edit') { replyTo = null; editing = m; txt.value = m.content; fit(); toggleSend(); showBar('✎ Üýtgetmek', m.content); txt.focus(); }
+    else if (k === 'delme') { const {error} = await sb.rpc('delete_message_for_me', {mid: m.id}); if (error) return alert(error.message); el.remove(); }
+    else if (k === 'delall') { if (!confirm('Habary hemmeler üçin pozmalymy?')) return; const {error} = await sb.from('messages').delete().eq('id', m.id); if (error) return alert(error.message); el.remove(); }
+  };
+}
+let lp = null, sx = 0, sy = 0; const stop = () => { clearTimeout(lp); lp = null; }, box = $('#msgs');
+box.addEventListener('pointerdown', e => { const el = e.target.closest('.m'); if (!el || el.classList.contains('pend') || e.target.closest('video')) return; sx = e.clientX; sy = e.clientY; lp = setTimeout(() => { lp = null; openCM(el); }, 380); });
+box.addEventListener('pointermove', e => { if (lp && Math.hypot(e.clientX - sx, e.clientY - sy) > 10) stop(); });
+['pointerup', 'pointercancel', 'scroll'].forEach(t => box.addEventListener(t, stop));
+box.addEventListener('contextmenu', e => { const el = e.target.closest('.m'); e.preventDefault(); if (el && !el.classList.contains('pend')) { stop(); openCM(el); } });
+box.addEventListener('click', e => { if (Date.now() - cmT < 600) { e.stopPropagation(); e.preventDefault(); } }, true);
+
+const _ds = doSend;
+doSend = function () {
+  if (!editing) return _ds(); const t = txt.value.trim(), m = editing; if (!t) return;
+  txt.value = ''; fit(); toggleSend(); clearBar(); if (t === m.content) return;
+  sb.from('messages').update({content: t}).eq('id', m.id).select().single().then(({data, error}) => error ? alert(error.message) : applyEdit(data));
+};
+const _sm = sendMsg; sendMsg = function (row) { if (replyTo) { row.reply_to = replyTo.id; clearBar(); } return _sm(row); };
+
+/* çat açylanda klawiatura çykmasyn, Android "yza" düwmesi işlesin */
+const _o3 = openChat;
+openChat = async function (u) { if (!u) return; clearBar(); closeCM(); if (mob()) history.pushState({c: 1}, ''); noF = true; try { await _o3(u); } finally { noF = false; } };
+const _bk = $('#back').onclick; $('#back').onclick = () => history.state?.c ? history.back() : _bk();
+addEventListener('popstate', () => { if (peer) _bk(); });
+
+/* beýleki adamyň üýtgeden habary real wagtda */
+const _st = start;
+start = async function (u) { await _st(u);
+  sb.channel('v3-' + me.id).on('postgres_changes', {event: 'UPDATE', schema: 'public', table: 'messages'}, ({new: m}) => {
+    const o = MM.get(String(m.id)); if (o && o.content !== m.content) applyEdit(m); else if (o) MM.set(String(m.id), m); }).subscribe();
+};
+})();
 </script>
 </body>
 </html>
