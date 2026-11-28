@@ -204,6 +204,232 @@ img{-webkit-user-drag:none}
 #rbar>div{flex:1;min-width:0;display:grid;border-left:3px solid var(--a);padding-left:10px}
 #rbar b{font-size:13px;color:var(--a2)}#rbar span{font-size:13px;color:var(--m);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
+
+<style id="tmchat-pro-refresh">
+:root{
+ --bg:#080d18;--side:#0d1525;--pane:#101b2e;--el:#17243a;--bd:#263750;
+ --t:#edf5ff;--m:#91a5bf;--a:#6d7cff;--a2:#28d8d0;--g:#23c98b;--r:#ff647c;
+ --me:linear-gradient(135deg,#5968ff 0%,#278fda 55%,#22bdb5 100%);
+ --in:#17263d;--shadow:0 18px 55px rgba(0,0,0,.38);
+}
+[data-theme=light]{
+ --bg:#eef3fb;--side:#fff;--pane:#f9fbff;--el:#edf2fa;--bd:#dce5f1;
+ --t:#17243b;--m:#71819b;--in:#e9eff8;--shadow:0 18px 55px rgba(34,58,98,.12);
+}
+body{background:radial-gradient(ellipse at 15% 0%,#23396a55,transparent 36%),var(--bg);letter-spacing:.005em}
+#splash{background:radial-gradient(ellipse at 50% 35%,#283e78,#080d18 72%)}
+.logo{background:linear-gradient(145deg,#6576ff,#27c6bf)!important;box-shadow:0 12px 34px #536dff55}
+.card,.pfc{backdrop-filter:blur(20px);border:1px solid color-mix(in srgb,var(--bd),transparent 12%);box-shadow:var(--shadow)}
+.app{grid-template-columns: minmax(300px,370px) minmax(0,1fr)}
+aside{background:color-mix(in srgb,var(--side),transparent 4%);backdrop-filter:blur(18px)}
+.sh{padding:17px 16px 10px}.sh b{letter-spacing:-.7px}
+.sh .logo{border-radius:13px}
+.ib{transition:background .18s,color .18s,transform .18s}
+.ib:active,.btn:active,.btn2:active{transform:scale(.96)}
+.u{padding:11px 10px;border:1px solid transparent}
+.u:hover{border-color:var(--bd);background:var(--el)}
+.u.on{background:linear-gradient(110deg,#6475ff25,#22c9bd16);border-color:#7386ff44}
+.av{box-shadow:0 0 0 1px #ffffff12}
+.sr input{background:var(--el);border-radius:15px;padding:13px 15px}
+.hd{padding:12px 18px;background:color-mix(in srgb,var(--side),transparent 3%);backdrop-filter:blur(18px)}
+#msgs{padding:20px clamp(14px,4vw,56px);background-color:var(--bg)}
+.m{padding:10px 13px 8px;border:1px solid #ffffff0b;box-shadow:0 5px 16px #0000000c;line-height:1.5}
+.m.in{background:var(--in);border-color:var(--bd)}
+.m.me{background:var(--me);border-color:#ffffff20}
+.mt{font-variant-numeric:tabular-nums}
+.cmp{padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--side);backdrop-filter:blur(18px)}
+.cmp .box{border-radius:25px;padding:3px 8px;background:var(--el)}
+.send{background:var(--me);box-shadow:0 8px 22px #486bff55}
+.btn{background:var(--me);border-radius:14px}
+.btn2{border-radius:14px}
+#sbar{padding-top:8px}
+.sb .av{width:58px;height:58px}
+#home{background:radial-gradient(ellipse at center,#1d3153 0%,var(--bg) 67%),var(--wp)}
+#home .logo{width:92px;height:92px;border-radius:30px}
+#home h2{letter-spacing:-1px}
+#pfb .btn,#pfb .btn2{min-height:46px}
+input,textarea,select{border-radius:14px}
+#ring .card{border-radius:28px}
+@media(max-width:760px){
+ .app{grid-template-columns:1fr}
+ .hd{padding:9px 10px}
+ #msgs{padding:12px 12px}
+ .cmp{padding-left:9px;padding-right:9px}
+}
+@media(min-width:1200px){#msgs{padding-left:clamp(42px,8vw,130px);padding-right:clamp(42px,8vw,130px)}}
+</style>
+
+
+<style id="tmchat-mobile-auth-refresh">
+/* Mobile-app interaction + redesigned sign-in / registration */
+html,body{overscroll-behavior:none;touch-action:pan-y}
+body,button,.m,.u,.hd,.sh,.logo{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea{ -webkit-user-select:text; user-select:text; }
+#auth{padding:clamp(14px,4vw,28px);overflow-y:auto;overscroll-behavior:contain;align-content:center;isolation:isolate;background:radial-gradient(ellipse at 12% 12%,#566dff30,transparent 42%),radial-gradient(ellipse at 90% 88%,#20cfc52b,transparent 42%),var(--bg)}
+#auth:before{width:min(70vw,460px);height:min(70vw,460px);background:#596bff;filter:blur(105px);opacity:.2}
+#auth:after{width:min(65vw,420px);height:min(65vw,420px);background:#20cfc5;filter:blur(105px);opacity:.16}
+#auth .card{width:min(100%,430px);max-width:430px;padding:clamp(22px,5vw,34px);gap:17px;border-radius:30px;background:color-mix(in srgb,var(--pane),transparent 5%);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid #8da7ff2c;box-shadow:0 24px 80px #0006;}
+.auth-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#auth .card .logo{width:58px;height:58px;border-radius:19px;margin:0;box-shadow:0 12px 30px #566dff55}
+#auth .card .logo svg{width:33px;height:33px}
+.auth-live{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid var(--bd);border-radius:30px;color:var(--m);font-size:11px;font-weight:700;letter-spacing:.04em}
+.auth-live i{width:7px;height:7px;border-radius:50%;background:#20d69b;box-shadow:0 0 12px #20d69b}
+.auth-heading{display:grid;gap:5px}
+#auth .card h1{text-align:left;font-size:clamp(25px,6vw,30px);letter-spacing:-.8px}
+#auth .card p.s{text-align:left;margin:0;color:var(--m);font-size:13px;line-height:1.55}
+#auth .tabs{padding:5px;border-radius:15px;background:var(--bg);border:1px solid var(--bd);gap:4px}
+#auth .tabs button{padding:12px 9px;border-radius:11px;font-size:13px;transition:.2s}
+#auth .tabs button.on{background:linear-gradient(120deg,#6376ff,#27bdbb);color:white;box-shadow:0 7px 18px #526bff35}
+.auth-fields{display:grid;gap:11px}
+#auth .auth-fields input{min-height:51px;border-radius:15px;padding:14px 16px;background:var(--el);border:1px solid var(--bd);font-size:15px!important;transition:border-color .2s,box-shadow .2s}
+#auth .auth-fields input:focus{border-color:#7185ff;box-shadow:0 0 0 4px #7185ff20}
+#auth .auth-fields input::placeholder{color:var(--m);opacity:.9}
+#uh{display:block;margin:-6px 3px 0!important;min-height:15px}
+#auth .str{height:5px;margin-top:-5px}
+#auth .auth-eye{padding:0 2px;font-size:12px;cursor:pointer}
+#auth .auth-eye input{accent-color:#687cff;width:17px;height:17px}
+#amsg{min-height:18px;text-align:left;padding:0 2px;font-size:12px;line-height:1.4}
+#auth .auth-submit{min-height:53px;display:flex;align-items:center;justify-content:center;gap:12px;border-radius:16px;font-size:15px;letter-spacing:.01em;background:linear-gradient(110deg,#6577ff,#398eea 55%,#22bdb5);box-shadow:0 12px 28px #536dff38}
+#auth .auth-submit span{font-size:20px;line-height:1;transition:transform .2s}
+#auth .auth-submit:active span{transform:translateX(4px)}
+#auth .auth-submit:disabled{opacity:.65;cursor:wait}
+.auth-foot{text-align:center!important;font-size:10px!important;color:var(--m);margin:0!important;line-height:1.5}
+@media(max-width:480px){#auth{padding:14px;place-items:center}#auth .card{padding:23px 20px;border-radius:25px;gap:15px}.auth-live{font-size:10px}}
+@media(max-height:650px){#auth{align-content:start;padding-top:12px;padding-bottom:12px}#auth .card{gap:11px;padding:18px 20px}.auth-top .logo{width:48px!important;height:48px!important}}
+/* No accidental text highlighting/copying on chat chrome; input editing remains normal */
+.m,.m *,.u,.u *,.hd,.sh,#home{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+button:focus-visible{outline:2px solid var(--a2);outline-offset:2px}
+</style>
+
+
+<style id="tmchat-mobile-pro-final">
+/* Fixed phone canvas: the document itself never drifts or zooms. */
+html,body{position:fixed!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;overflow:hidden!important;overscroll-behavior:none!important;touch-action:none!important;-webkit-text-size-adjust:100%;}
+body{margin:0;max-width:100vw;}
+.app{position:fixed!important;inset:0!important;width:100vw!important;height:var(--vh,100dvh)!important;min-height:0!important;overflow:hidden!important;}
+aside,main{min-width:0;min-height:0;overflow:hidden;}
+#msgs,#list{min-height:0;overscroll-behavior:contain;touch-action:pan-y!important;-webkit-overflow-scrolling:touch;}
+#sbar{overscroll-behavior-x:contain;touch-action:pan-x!important;-webkit-overflow-scrolling:touch;}
+#auth{position:fixed!important;inset:0!important;width:100vw!important;height:var(--vh,100dvh)!important;min-height:0;overflow-x:hidden!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y!important;-webkit-overflow-scrolling:touch;display:grid;place-items:center;align-content:center;padding:clamp(12px,3.5vw,26px);background:radial-gradient(ellipse at 8% 10%,#596bff35,transparent 38%),radial-gradient(ellipse at 95% 92%,#23d6c22a,transparent 42%),linear-gradient(145deg,#080e1c,#10172b 55%,#091322);isolation:isolate;}
+#auth:before,#auth:after{content:"";position:absolute;z-index:-1;border-radius:50%;filter:blur(80px);pointer-events:none;}
+#auth:before{width:250px;height:250px;top:-110px;left:-90px;background:#655bff;opacity:.26;}
+#auth:after{width:280px;height:280px;right:-120px;bottom:-120px;background:#18c9bd;opacity:.2;}
+#auth .auth-card{width:min(100%,440px);max-width:440px;padding:clamp(20px,5vw,30px);gap:17px;border-radius:28px;background:linear-gradient(155deg,#151f35f2,#0d1729f5);border:1px solid #91a9ff32;box-shadow:0 28px 90px #0009, inset 0 1px #ffffff10;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);}
+.auth-brand{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.auth-brand-left{display:flex;align-items:center;gap:11px;min-width:0;}
+#auth .auth-brand .logo{width:48px;height:48px;border-radius:16px;margin:0;box-shadow:0 10px 26px #536dff55;}
+#auth .auth-brand .logo svg{width:28px;height:28px;}
+.auth-brand-name{display:grid;gap:1px;}
+.auth-brand-name b{font-size:19px;letter-spacing:-.6px;color:#f3f6ff;}
+.auth-brand-name small{font-size:8px;letter-spacing:1.4px;color:#8fa4c5;font-weight:800;}
+.auth-secure{display:flex;align-items:center;gap:6px;color:#a6b8d5;font-size:9px;font-weight:800;letter-spacing:.35px;padding:7px 9px;border:1px solid #8da6c52b;border-radius:30px;background:#ffffff06;white-space:nowrap;}
+.auth-secure i{width:6px;height:6px;border-radius:50%;background:#27d6a1;box-shadow:0 0 10px #27d6a1;}
+.auth-intro{display:grid;gap:6px;padding:3px 1px 0;}
+#auth .auth-kicker{font-size:9px;font-weight:800;letter-spacing:1.8px;color:#55d7d0;}
+#auth .auth-intro h1{text-align:left;font-size:clamp(26px,7vw,32px);line-height:1.08;letter-spacing:-1.15px;color:#f5f7ff;}
+#auth .auth-intro p.s{text-align:left;margin:0;color:#9aabc7;font-size:12px;line-height:1.55;}
+#auth .tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:5px;border-radius:15px;background:#080f1e;border:1px solid #7d92b51f;}
+#auth .tabs button{padding:12px 8px;border-radius:11px;color:#91a2bf;font-size:12px;font-weight:800;transition:background .2s,color .2s,box-shadow .2s;}
+#auth .tabs button.on{color:white;background:linear-gradient(110deg,#6574ff,#358fda 60%,#20b9b0);box-shadow:0 7px 18px #416dff3a;}
+#auth .auth-fields{display:grid;gap:11px;}
+#auth .auth-field{display:grid;gap:6px;min-width:0;}
+#auth .auth-field>span,#auth .auth-field>label{font-size:10px;color:#a9b9d2;font-weight:800;letter-spacing:.3px;padding-left:3px;}
+#auth .auth-field input{width:100%;height:49px;min-height:49px;border-radius:13px;padding:0 14px;background:#0a1425;color:#f1f5ff;border:1px solid #7f98c02c;font-size:16px!important;box-shadow:inset 0 1px 3px #0003;}
+#auth .auth-field input:focus{border-color:#5d9cff;box-shadow:0 0 0 3px #5d9cff20;}
+#auth .auth-field input::placeholder{color:#7185a4;opacity:1;font-size:13px;}
+#auth #uh{display:block;margin:1px 3px 0!important;min-height:14px;font-size:11px;}
+#auth .auth-strength{height:5px;margin:-4px 2px 0;background:#ffffff12;border-radius:20px;overflow:hidden;}
+#auth .auth-strength i{display:block;height:100%;width:0;transition:width .2s;background:#21c99d;border-radius:20px;}
+#auth .auth-eye{display:flex;align-items:center;gap:8px;margin:0;color:#a8b8d1;font-size:11px;font-weight:600;}
+#auth .auth-eye input{width:16px;height:16px;accent-color:#6d80ff;margin:0;}
+#auth #amsg{min-height:16px;text-align:left;padding:0 2px;color:#ff8294;font-size:11px;line-height:1.4;overflow-wrap:anywhere;}
+#auth .auth-submit{width:100%;min-height:52px;border:0;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:12px;background:linear-gradient(105deg,#6476ff,#398fdf 55%,#1dbbb1);box-shadow:0 12px 28px #416dff42;color:#fff;font-size:14px;font-weight:800;letter-spacing:.2px;}
+#auth .auth-submit span{font-size:20px;line-height:1;transition:transform .2s;}
+#auth .auth-submit:active span{transform:translate(3px,-2px);}
+#auth .auth-submit:disabled{opacity:.58;cursor:wait;}
+#auth .auth-foot{text-align:center;margin:0;color:#7387a7;font-size:9px;line-height:1.5;}
+#auth.signup-mode .auth-card{border-color:#35d4c44d;box-shadow:0 28px 90px #0009,0 0 36px #1cc5b50b,inset 0 1px #ffffff12;}
+#auth.signup-mode .auth-kicker{color:#62e1c9;}
+@media(max-width:480px){#auth{padding:12px;place-items:center;}#auth .auth-card{padding:21px 18px;border-radius:24px;gap:14px;}#auth .auth-brand .logo{width:44px;height:44px;}#auth .auth-secure{font-size:8px;padding:6px 7px;}}
+@media(max-height:700px){#auth{place-items:start center;padding-top:10px;padding-bottom:10px;}#auth .auth-card{gap:11px;padding:17px 18px;}#auth .auth-fields{gap:8px;}#auth .auth-field input{height:44px;min-height:44px;}#auth .auth-brand .logo{width:40px;height:40px;}}
+@media(orientation:landscape) and (max-height:520px){#auth{place-items:start center;}#auth .auth-card{width:min(560px,96vw);grid-template-columns:1fr 1fr;gap:10px 16px;}#auth .auth-brand,#auth .auth-intro,#auth .tabs,#auth .auth-eye,#auth #amsg,#auth .auth-submit,#auth .auth-foot{grid-column:1/-1;}#auth .auth-fields{grid-template-columns:1fr 1fr;align-items:end;}}
+/* Keep text selection/copy disabled in the app surface; form fields remain editable. */
+body,button,.m,.u,.hd,.sh,.logo,#home{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+input,textarea,select{-webkit-user-select:text;user-select:text;}
+</style>
+
+
+<style id="tmchat-screen-lock">
+/* Esasy telefon ekrany hereketsiz */
+html, body {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
+}
+
+/* Programmanyň daşky penjiresi */
+.app {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: var(--vh, 100dvh) !important;
+    overflow: hidden !important;
+    min-height: 0 !important;
+}
+
+/* Registrasiýa sahypasy hem daşyndan süýşmesin */
+#auth {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: var(--vh, 100dvh) !important;
+    overflow: hidden !important;
+    touch-action: none !important;
+    overscroll-behavior: none !important;
+    display: grid;
+    place-items: center;
+}
+
+/* Diňe registrasiýanyň içindäki mazmun zerur bolsa aýlansyn */
+#auth .auth-card {
+    max-height: calc(var(--vh, 100dvh) - 24px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Diňe habarlar we ulanyjy sanawy aýlansyn */
+#msgs, #list {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Stories gapdala hereket edip biler */
+#sbar {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    touch-action: pan-x !important;
+}
+
+/* Gapdala umumy süýşme bolmasyn */
+body, .app, main, aside {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+}
+</style>
+
 </head>
 <body>
 
@@ -216,16 +442,32 @@ img{-webkit-user-drag:none}
 </div>
 
 <div id="auth" class="hide">
-  <form class="card" id="af">
-    <div class="logo grad"><svg><use href="#lg"/></svg></div>
-    <h1>TMChat</h1>
-    <p class="s">Çalt, howpsuz we gözel aragatnaşyk</p>
-    <div class="tabs"><button type="button" class="on" id="t1">Girmek</button><button type="button" id="t2">Hasap açmak</button></div>
-    <input id="afn" class="hide" placeholder="Doly adyňyz" autocomplete="name"><input id="aun" class="hide" placeholder="Ulanyjy ady (a-z, 0-9, _)" autocomplete="username"><small id="uh" class="hide"></small>
-    <input id="aem" type="email" placeholder="E-poçta" required autocomplete="email">
-    <input id="apw" type="password" placeholder="Parol (iň az 6 simwol)" required minlength="6" autocomplete="current-password"><div class="str hide" id="str"><i></i></div><input id="apw2" type="password" class="hide" placeholder="Paroly gaýtalaň" autocomplete="new-password"><label class="sp"><input type="checkbox" id="eye"> Paroly görkez</label>
-    <div id="amsg"></div>
-    <button class="btn" id="abtn">Girmek</button>
+  <form class="card auth-card" id="af" autocomplete="on">
+    <div class="auth-brand">
+      <div class="auth-brand-left">
+        <div class="logo grad"><svg><use href="#lg"/></svg></div>
+        <div class="auth-brand-name"><b>TMChat</b><small>YOUR WORLD. YOUR PEOPLE.</small></div>
+      </div>
+      <span class="auth-secure"><i></i> HOWpsuz aragatnaşyk</span>
+    </div>
+    <div class="auth-intro">
+      <span class="auth-kicker" id="authkicker">TMCHAT • HOŞ GELDIŇIZ</span>
+      <h1 id="authTitle">Hoş geldiňiz!</h1>
+      <p class="s" id="authsub">Hasabyňyza giriň we söhbetdeşligi dowam ediň.</p>
+    </div>
+    <div class="tabs"><button type="button" class="on" id="t1">Girmek</button><button type="button" id="t2">Täze hasap</button></div>
+    <div class="auth-fields">
+      <label class="auth-field hide" id="afnrow"><span>Doly adyňyz</span><input id="afn" placeholder="Meselem: Myrat Annageldiýew" autocomplete="name" maxlength="60"></label>
+      <div class="auth-field hide" id="aunrow"><label for="aun">Ulanyjy ady</label><input id="aun" placeholder="mysal_123" autocomplete="username" autocapitalize="none" maxlength="20"><small id="uh" class="hide"></small></div>
+      <label class="auth-field"><span>E-poçta salgyňyz</span><input id="aem" type="email" placeholder="name@example.com" required autocomplete="email" inputmode="email"></label>
+      <label class="auth-field"><span>Parol</span><input id="apw" type="password" placeholder="Iň az 6 simwol" required minlength="6" autocomplete="current-password"></label>
+      <div class="str auth-strength hide" id="str"><i id="strengthbar"></i></div>
+      <label class="auth-field hide" id="apw2row"><span>Paroly gaýtalaň</span><input id="apw2" type="password" placeholder="Paroly gaýtadan giriziň" autocomplete="new-password"></label>
+    </div>
+    <label class="sp auth-eye"><input type="checkbox" id="eye"> <span>Paroly görkez</span></label>
+    <div id="amsg" role="status" aria-live="polite"></div>
+    <button class="btn auth-submit" id="abtn" type="submit">Girmek <span>↗</span></button>
+    <p class="auth-foot">TMChat — ýakynlaryň bilen aragatnaşykda bol.</p>
   </form>
 </div>
 
@@ -354,24 +596,6 @@ function mode(s) {
   $('#abtn').textContent = s ? 'Hasap açmak' : 'Girmek'; $('#amsg').textContent = '';
 }
 $('#t1').onclick = () => mode(false); $('#t2').onclick = () => mode(true);
-$('#af').onsubmit = async e => {
-  e.preventDefault();
-  const em = $('#aem').value.trim(), pw = $('#apw').value, msg = $('#amsg'); msg.textContent = '';
-  if (signup) {
-    const un = $('#aun').value.trim().toLowerCase();
-    if (!/^[a-z0-9_]{3,20}$/.test(un)) return msg.textContent = 'Ulanyjy ady: 3-20 simwol (a-z, 0-9, _)';
-    const f = await sb.rpc('username_free', {u: un});
-    if (f.data === false) return msg.textContent = 'Bu ulanyjy ady eýelenen';
-    const {data, error} = await sb.auth.signUp({email: em, password: pw, options: {data: {username: un, full_name: un}}});
-    if (error) return msg.textContent = error.message;
-    if (!data.session) return msg.textContent = 'E-poçtaňyzy tassyklaň, soň giriň.';
-    start(data.user);
-  } else {
-    const {data, error} = await sb.auth.signInWithPassword({email: em, password: pw});
-    if (error) return msg.textContent = error.message;
-    start(data.user);
-  }
-};
 $('#out').onclick = async () => { await sb.auth.signOut(); location.reload(); };
 
 (async () => {
@@ -735,7 +959,7 @@ $('#ng').innerHTML = ic('group'); $('#svl').innerHTML = ic('heart'); $('#svcs').
 
 /* ---------- Registrasiýa ---------- */
 const _mode = mode;
-mode = s => { _mode(s); ['#afn', '#apw2', '#str', '#uh'].forEach(x => $(x).classList.toggle('hide', !s)); $('#afn').required = s; $('#apw2').required = s; $('#apw').autocomplete = s ? 'new-password' : 'current-password'; };
+mode = s => { _mode(s); ['#afnrow','#aunrow','#apw2row','#str','#uh'].forEach(x => $(x).classList.toggle('hide', !s)); $('#auth').classList.toggle('signup-mode', s); $('#apw2').required = s; $('#authTitle').textContent = s ? 'Täze hasap dörediň' : 'Hoş geldiňiz!'; $('#authkicker').textContent = s ? 'TMCHAT • TÄZE HASAP' : 'TMCHAT • HOŞ GELDIŇIZ'; $('#authsub').textContent = s ? 'Birnäçe ädimde hasabyňyzy dörediň we dostlaryňyz bilen birleşiň.' : 'Hasabyňyza giriň we söhbetdeşligi dowam ediň.'; $('#abtn').innerHTML = s ? 'Hasap döretmek <span>↗</span>' : 'Girmek <span>↗</span>'; $('#eye').checked = false; $('#apw').type = $('#apw2').type = 'password'; $('#apw').autocomplete = s ? 'new-password' : 'current-password'; };
 $('#eye').onchange = e => $('#apw').type = $('#apw2').type = e.target.checked ? 'text' : 'password';
 $('#apw').oninput = () => { const v = $('#apw').value, s = (v.length >= 6) + (v.length >= 10) + /[A-Z]/.test(v) + /\d/.test(v) + /[^\w]/.test(v);
   $('#str i').style.cssText = `width:${s * 20}%;background:${['#ef4444', '#ef4444', '#f59e0b', '#22c55e', '#22c55e', '#22d3ee'][s]}`; };
@@ -761,6 +985,15 @@ $('#af').onsubmit = async e => {
     }
   } finally { b.disabled = false; }
 };
+
+/* Avoid accidental long-press selection / browser copy menus in the app UI. */
+(() => {
+  const editable = el => !!el?.closest('input,textarea,select,[contenteditable="true"]');
+  document.addEventListener('contextmenu', e => { if (!editable(e.target)) e.preventDefault(); });
+  document.addEventListener('selectstart', e => { if (!editable(e.target)) e.preventDefault(); });
+  document.addEventListener('copy', e => { if (!editable(e.target)) e.preventDefault(); });
+  document.addEventListener('dragstart', e => { if (!editable(e.target)) e.preventDefault(); });
+})();
 
 /* ---------- Başlangyç + realtime ---------- */
 const _start = start;
@@ -1047,5 +1280,70 @@ start = async function (u) { await _st(u);
 };
 })();
 </script>
+
+<script id="tmchat-reactions">
+(() => {
+  const reactionSet = ['👍','❤️','😂','😮','😢','🔥'];
+  const originalBubble = bubble;
+  bubble = function(message) {
+    const node = originalBubble(message);
+    const bar = document.createElement('div');
+    bar.className = 'tm-reactions';
+    bar.style.cssText = 'display:flex;gap:5px;align-items:center;flex-wrap:wrap;flex:0 0 100%;margin-top:5px';
+    const add = document.createElement('button');
+    add.type = 'button'; add.textContent = '＋';
+    add.title = 'Reaksiýa goş';
+    add.style.cssText = 'border:1px solid #ffffff35;border-radius:12px;padding:2px 8px;font-size:13px;background:#ffffff14;color:inherit';
+    add.onclick = async ev => {
+      ev.stopPropagation();
+      if (!me?.id) return;
+      const chosen = prompt('Reaksiýa saýlaň: ' + reactionSet.join(' '), '👍');
+      if (!reactionSet.includes(chosen)) return;
+      const {error} = await sb.from('message_reactions').upsert(
+        {message_id: message.id, user_id: me.id, emoji: chosen},
+        {onConflict:'message_id,user_id'}
+      );
+      if (error) return alert('Reaksiýa iberilmedi: ' + error.message);
+      await paintReactions(message.id, bar);
+    };
+    bar.append(add);
+    node.append(bar);
+    paintReactions(message.id, bar);
+    return node;
+  };
+
+  async function paintReactions(messageId, bar) {
+    if (!bar) return;
+    const {data, error} = await sb.from('message_reactions')
+      .select('emoji,user_id').eq('message_id', messageId);
+    if (error) return;
+    bar.querySelectorAll('[data-reaction]').forEach(x => x.remove());
+    const counts = {};
+    (data || []).forEach(x => {
+      counts[x.emoji] ||= {n:0,mine:false};
+      counts[x.emoji].n++;
+      if (x.user_id === me?.id) counts[x.emoji].mine = true;
+    });
+    Object.entries(counts).forEach(([emoji, info]) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.dataset.reaction = '1';
+      b.textContent = emoji + ' ' + info.n;
+      b.title = info.mine ? 'Reaksiýany aýyrmak' : 'Reaksiýa goşmak';
+      b.style.cssText = 'border:1px solid var(--bd);border-radius:12px;padding:2px 8px;font-size:12px;background:'+(info.mine?'#6475ff35':'var(--el)')+';color:inherit';
+      b.onclick = async ev => {
+        ev.stopPropagation();
+        const q = sb.from('message_reactions').delete()
+          .eq('message_id',messageId).eq('user_id',me.id);
+        const result = info.mine ? await q : await sb.from('message_reactions')
+          .upsert({message_id:messageId,user_id:me.id,emoji},{onConflict:'message_id,user_id'});
+        if (result.error) return alert(result.error.message);
+        paintReactions(messageId,bar);
+      };
+      bar.append(b);
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
